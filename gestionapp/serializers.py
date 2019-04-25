@@ -26,9 +26,11 @@ class ArticuloSerializer(serializers.ModelSerializer):
     class Meta:
         model = Articulo
         fields = ('id', 'codigo', 'descripcion',
-                  'cantidad', 'color', 'deposito')
-
-
+                  'cantidad', 'color', 'deposito',
+                   'descolor','stock1','codbarra','stockalm1','stockalm2','stockalm3','afectoigv','preciocosto','precioventa', 
+                   'aplicadscto','cc1','descc1','modelo','genero','talla','ruc','desruc','unimed',
+                   'desunimed','umdsali','umdsaliconv')
+ 
 class ClienteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cliente

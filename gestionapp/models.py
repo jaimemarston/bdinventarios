@@ -200,6 +200,7 @@ class Articulo(models.Model):
     descripcion = models.CharField(max_length=60)
     cantidad = models.IntegerField(default=0)
     color = models.CharField(max_length=2, default=0, choices=COLORES)
+    descolor = models.CharField(max_length=60, blank=True, null=True)
     deposito = models.ForeignKey(Deposito, null=True, on_delete=models.SET_NULL)
     stock1 = models.IntegerField(default=0)
     codbarra = models.CharField(max_length=60, blank=True, null=True)
@@ -212,7 +213,15 @@ class Articulo(models.Model):
     aplicadscto = models.IntegerField(default=0)
     cc1 = models.CharField(max_length=60, blank=True, null=True)
     descc1 = models.CharField(max_length=60, blank=True, null=True)
-
+    modelo = models.CharField(max_length=60, blank=True, null=True)
+    genero = models.CharField(max_length=30, blank=True, null=True)
+    talla = models.CharField(max_length=30, blank=True, null=True)
+    ruc = models.CharField(max_length=11, blank=True, null=True)
+    desruc = models.CharField(max_length=60, blank=True, null=True)
+    unimed = models.CharField(max_length=30, blank=True, null=True)
+    desunimed = models.CharField(max_length=30, blank=True, null=True)
+    umdsali = models.CharField(max_length=30, blank=True, null=True)
+    umdsaliconv = models.CharField(max_length=30, blank=True, null=True)
 
 class Centrodecosto1(models.Model):
     codigo = models.IntegerField()
