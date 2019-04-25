@@ -1,0 +1,17 @@
+POST http://127.0.0.1:8000/cliente HTTP/1.1 
+content-type: application/json
+
+{
+    "codigo": "01646",
+    "nombre": "HOTEL CAJAMARCA89"
+}
+
+{
+    "data" : [{
+        "codigo" : "01646",
+        "nombre" : "HOTEL CAJAMARCA89"
+        },
+        {"codigo" : "01647","nombre" : "HOTEL CAJAMARCA89"
+        }
+        ]
+        }

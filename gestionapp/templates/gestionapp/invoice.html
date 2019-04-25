@@ -1,0 +1,286 @@
+{% extends "gestionapp/base.html" %}
+<!--https://github.com/spipu/html2pdf/issues/81-->
+{% load static %}
+{% block layout_style %}
+{% endblock %}
+{% block extra_style %}
+<style type="text/css">
+    html {
+        font-family: "Helvetica", "sans-serif";
+        color: #333333;
+    }
+
+    p {
+        margin: 0 0 6px 0;
+        font-size: 8pt;
+    }
+
+    table {
+        line-height: 140%;
+        margin-bottom: 20px;
+        page-break-inside: avoid;
+    }
+
+    table.bordered {
+        border-top: 0.1pt solid #999999;
+        border-bottom: 0.1pt solid #999999;
+    }
+
+    tr,
+    td,
+    th {
+        border: none;
+    }
+
+    th {
+        font-size: 10pt;
+        border-bottom: 0.1pt solid #999999;
+        padding: 3px 0;
+        line-height: 1;
+        font-weight: bold;
+    }
+
+    td {
+        font-size: 10pt;
+        vertical-align: top;
+        padding: 3px 0;
+    }
+
+    td:last-child {
+        padding-bottom: 0;
+    }
+
+    .text-left {
+        text-align: left;
+    }
+
+    .text-right {
+        text-align: right;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .bottom-10 {
+        margin-bottom: 10px;
+    }
+
+    .bottom-20 {
+        margin-bottom: 20px;
+    }
+
+    .header {
+        color: #7f7f7f;
+        position: running(header)
+    }
+
+    .foot-1 {
+        font-size: 20px;
+        line-height: 1.5em;
+    }
+
+    .header-link {
+        font-weight: bold;
+        text-decoration: none;
+        color: #4F81BD;
+        font-size: 14px;
+    }
+
+    .logo {
+        margin-bottom: 20px;
+        margin-left: -25px;
+    }
+
+    .logo img {
+        zoom: 60%;
+    }
+
+    .recipient {
+        margin-left: 12cm;
+    }
+
+    .main h1 {
+        margin: 18px 0 18px 0;
+        font-size: 250%;
+        font-weight: normal;
+        color: #4F81BD;
+    }
+
+    .main h3 {
+        margin: 18px 0 18px 0;
+        font-weight: normal;
+        color: #4F81BD;
+    }
+
+    .main h2 {
+        margin: 18px 0 6px 0;
+        font-size: 180%;
+        font-weight: normal;
+    }
+
+    .info {
+        border: 1px solid #4F81BD;
+        padding: 10px;
+        margin-top: 50px;
+        margin-bottom: 50px;
+    }
+
+    .info a {
+        color: #4F81BD;
+        text-decoration: none;
+    }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<div id="page-header">
+    <div class="header">
+        <p class="logo">
+            <img src="{% static 'img/logo.jpg' %}" width="650px" height="250px">
+        </p>
+        <p>
+            {{ 'Av Ricardo Palma 781' }} {{ 'Miraflores' }} <br />
+            {{ 'LIMA - PERU' }}<br />
+            {{ today|date:"DATETIME_FORMAT" }}
+
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_content %}
+
+
+<div id="content">
+    <div class="recipient bottom-10">
+
+    </div>
+
+    <div class="main">
+        <h3>{{ 'DETALLE DE LA COTIZACION' }}</h3>
+
+        <table class="bordered bottom-20">
+            <tr>
+                {% for field in headerset %}
+                <td class="item-name"><strong>Numero de Cotizacion:</strong>{{ field.codigo }}</td>
+                <td class="item-name"><strong>Dirigido a : </strong>{{ field.desruc }}</td>
+                <td class="item-name"><strong>Expresado en : </strong>{{ field.desmonepago }}</td>
+
+                {% endfor %}
+            </tr>
+
+        </table>
+
+        <table>
+            <thead>
+                <tr>
+                    {% for field in fields %}
+                    <th class="text-left">{{ field }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for q in cotizacion %}
+                <tr>
+                    {% for k in fields_db %}
+                    <td class="text-left">{{ q|get_item:k }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <table class="bottom-20">
+            <tr>
+                <td class="text-right"><strong>Total Presupuesto</strong></td>
+                <td class="text-right"><strong>{{resultado_total}}</strong></td>
+                <td class="text-right"><strong>{{muestra_imagenes}}</strong></td>
+                <!--<img src="{% static 'img/logo.jpg' %}" width="150px" height="150px">-->
+                <!--<img src='/media/unidad/linked.png' width="150px" height="150px">-->
+
+            </tr>
+        </table>
+        <table class="bottom-20">
+            {% for img1 in muestra_imagenes1 %}
+            <tr>
+                <td class="text-left">/media/{{img1}}</td>
+                <img src=/media/{{img1}} width="150px" height="150px">
+                <br>
+                <!--<img src="/media/unidad/linked.png" width="150px" height="150px">-->
+            </tr>
+            {% endfor %}
+        </table>
+        <table class="bottom-20">
+                {% for img1 in muestra_imagenes2 %}
+                <tr>
+                    <td class="text-left">/media/{{img1}}</td>
+                    <img src=/media/{{img1}} width="150px" height="150px">
+                    <br>
+                    <!--<img src="/media/unidad/linked.png" width="150px" height="150px">-->
+                </tr>
+                {% endfor %}
+            </table>
+    </div>
+</div>
+
+<pdf:nextpage />
+
+
+
+{% endblock %}
+{% block page_foot %}
+
+<br> <i>Para confirmar la reserva, necesitamos datos de los pasajeros, # de vuelos y nombre del hotel. </i> </br>
+<b>CONDICIONES</b>
+
+<p>
+
+    &#10004 Precios en dólares, incluye IGV</br>
+    &#10004 Si la tarifa está en moneda extranjera, se considera al tipo de cambio del día de envío de la
+    cotización.</br>
+    &#10004 El precio está en función a lo solicitado. Tendrá 20 minutos de tolerancia, pasado el horario se procederá a
+    cobrar hora adicional según tarifario y tipo de unidad.</br>
+    &#10004 Tarifa sujeta a disponibilidad sin previo aviso y se confirma al momento de hecha la reserva.</br>
+    &#10004 De producirse una cancelación 24 horas antes del servicio será considerado no show y se cobrará el 100% del
+    valor total de la factura.</br>
+    &#10004 No se permite comer, tomar bebidas alcohólicas ni fumar en la unidad. Así como tampoco ingresar a la unidad
+    en estado etílico o con efectos de haber ingerido otras sustancias.</br>
+    &#10004 No se permite realizar paradas dutante el trayecto en los servicios de Full Day, por disposición del
+    Ministerio de Transporte para evitar multas. Caso excepcionales puede consultarlo previamente.</br>
+    &#10004 En caso de daño o perjuicio por parte de los pasajeros a la unidad, será responsable la empresa contratante
+    por el 100% de los gastos ocasionados.</br>
+    &#10004 Es importante que todos los pasajeros porten su DNI, Adultos (según Numeral 802.2 del Artículo 80° D.S. N°
+    017 - 2009 -MTC) y Niños (según Artículo 14° - D. S. N° 007- 2008 IN), si salen fuera de Lima, ya que TOLERANCIA
+    CERO lo solicitará.</br>
+    &#10004 Niños de 04 años a más, van en sus respectivos asientos.</br>
+    &#10004 Alitour no es responsable de perjuicio o retraso derivado de circunstancias ajenas a su control, como:
+    desastres naturales como terremotos, ciclones, tormentas, huracanes, inundaciones, niebla, etc. Así como a causas de
+    fuerza mayor: guerras, accidentes, huelgas, disturbios, manifestaciones o conmoción civil, etc, y a cualquier
+    pérdida, daño, accidente o alguna otra irregularidad.</br>
+</p>
+
+
+
+<b> INCLUYE:</b>
+
+&#10004 Uso del vehículo por los días/horas contratados.</br>
+&#10004 Conductores profesionales.</br>
+&#10004 Combustible del vehículo, peajes y parqueos</br>
+&#10004 Viáticos para los alojamientos y alimentación del conductor</br>
+
+UNIDADES FULL EQUIPO CUENTAN CON:</br>
+
+&#10004 Aire Acondicionado</br>
+&#10004 Baño químico</br>
+&#10004 TV led, DVD</br>
+&#10004 Reproductor mp3 y micrófonos </br>
+&#10004 Asientos reclinables</br>
+&#10004 Extintor antiincendios, botiquín de primeros auxilios, llantas de repuesto y herramientas necesarias.</br>
+&#10004 Cinturones de seguridad en todos los asientos</br>
+&#10004 Permiso de Circulación Nacional otorgado por el MTC</br>
+&#10004 SOAT Turístico contra accidentes de los pasajeros</br>
+&#10004 Monitoreo satelital con GPS</br>
+<b>Saludos Cordiales,</b>
+
+{% endblock %}
