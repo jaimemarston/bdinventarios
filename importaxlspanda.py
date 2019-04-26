@@ -4,11 +4,15 @@ import pandas as pd
 from pandas import ExcelWriter
 from pandas import ExcelFile
 
-filename="E:\proyectosdjango\Insumos_app_inventarios\PRUEBA.xlsx"
+filename="E:\proyectosdjango\Insumos_app_inventarios\PRUEBA3.xlsx"
 #con=sqlite3.connect('dbinventario.sqlite3')
 
 con = sqlite3.connect("dbinventario.sqlite3")
- 
+ # Get a cursor object
+cursor      = con.cursor()
+dropTableStatement = "DELETE FROM gestionapp_articulo"
+
+cursor.execute(dropTableStatement)
 df = pd.read_excel(filename, sheet_name='Sheet1')
 print("Column headings:")
 print(df.columns)

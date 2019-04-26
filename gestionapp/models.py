@@ -222,7 +222,8 @@ class Articulo(models.Model):
     desunimed = models.CharField(max_length=30, blank=True, null=True)
     umdsali = models.CharField(max_length=30, blank=True, null=True)
     umdsaliconv = models.CharField(max_length=30, blank=True, null=True)
-
+    tipo = models.CharField(max_length=60, blank=True, null=True) 
+      
 class Centrodecosto1(models.Model):
     codigo = models.IntegerField()
     descripcion = models.CharField(max_length=60, blank=True, null=True)

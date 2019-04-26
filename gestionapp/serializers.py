@@ -29,7 +29,7 @@ class ArticuloSerializer(serializers.ModelSerializer):
                   'cantidad', 'color', 'deposito',
                    'descolor','stock1','codbarra','stockalm1','stockalm2','stockalm3','afectoigv','preciocosto','precioventa', 
                    'aplicadscto','cc1','descc1','modelo','genero','talla','ruc','desruc','unimed',
-                   'desunimed','umdsali','umdsaliconv')
+                   'desunimed','umdsali','umdsaliconv','tipo')
  
 class ClienteSerializer(serializers.ModelSerializer):
     class Meta:
