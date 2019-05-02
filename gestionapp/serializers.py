@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from gestionapp.models import Deposito, Articulo, Cliente, Proveedor, Unidad, Programagastos, Mcotizacion, Dcotizacion, \
+from gestionapp.models import Deposito, Material, Articulo, Cliente, Proveedor, Unidad, Programagastos, Mcotizacion, Dcotizacion, \
     Clientesdireccion, Banco, CotizacionEstado
 
 
@@ -21,6 +21,15 @@ class UnidadSerializer(serializers.ModelSerializer):
         model = Unidad
         fields = ('id', 'codigo', 'descripcion', 'placa', 'npasajeros', 'color', 'foto1', 'foto2')
 
+
+class MaterialSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Material
+        fields = ('id', 'codigo', 'descripcion',
+                  'cantidad', 'color', 'deposito',
+                   'descolor','stock1','codbarra','stockalm1','stockalm2','stockalm3','afectoigv','preciocosto','precioventa', 
+                   'aplicadscto','cc1','descc1','modelo','genero','talla','ruc','desruc','unimed',
+                   'desunimed','umdsali','umdsaliconv','tipo')
 
 class ArticuloSerializer(serializers.ModelSerializer):
     class Meta:

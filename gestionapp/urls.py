@@ -13,8 +13,12 @@ router.register(r'cotizacion_estado', views.CotizacionEstadoViewSet)
 urlpatterns = [
     url(r'^deposito$', views.DepositoList.as_view()),
     url(r'^deposito/(?P<pk>[0-9]+)$', views.DepositoDetail.as_view()),
+
     url(r'^articulo$', views.ArticuloList.as_view()),
     url(r'^articulo/(?P<pk>[0-9]+)$', views.ArticuloDetail.as_view()),
+
+    url(r'^material$', views.MaterialList.as_view()),
+    url(r'^material/(?P<pk>[0-9]+)$', views.MaterialDetail.as_view()),
 
     url(r'^cliente$', views.ClienteList.as_view()),
     url(r'^cliente/(?P<pk>[0-9]+)$', views.ClienteDetail.as_view()),
@@ -37,5 +41,7 @@ urlpatterns = [
     url(r'^banco$', views.BancoList.as_view()),
     url(r'^generate_pdf$', views.GeneratePDFCotizacionesDetail.as_view()),
     url(r'^generate_pdf/(?P<pk>\d+)/$', views.GeneratePDFCotizacionesDetail.as_view()),
-    url(r'^generate_html$', TemplateView.as_view(template_name="gestionapp/invoice.html"))
+    url(r'^generate_html$', TemplateView.as_view(template_name="gestionapp/invoice.html")),
+    url(r'^export_xls$',views.export_users_xls, name='materiales'),
+
 ]

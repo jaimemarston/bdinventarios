@@ -3,14 +3,15 @@ from django.utils.timezone import now
 from rest_framework import generics
 from rest_framework.viewsets import ModelViewSet
 from django.db.models import Sum
+import xlwt
 
 from gestionapp.models import (
-    Deposito, Articulo, Cliente, Proveedor, Unidad, Mcotizacion,
+    Deposito, Material, Articulo, Cliente, Proveedor, Unidad, Mcotizacion,
     Dcotizacion, Clientesdireccion, Banco,
     CotizacionEstado)
 
 from gestionapp.serializers import (
-    DepositoSerializer, ArticuloSerializer, ClienteSerializer, ProveedorSerializer, UnidadSerializer,
+    DepositoSerializer, MaterialSerializer, ArticuloSerializer, ClienteSerializer, ProveedorSerializer, UnidadSerializer,
     McotizacionSerializer, DcotizacionSerializer, ClientesdireccionSerializer,
     ClientesdirecciondetalleSerializer, BancoSerializer,
     CotizacionEstadoSerializer)
@@ -24,10 +25,12 @@ from rest_framework.decorators import api_view
 from rest_framework.decorators import action
 import base64
 from django.templatetags.static import static
+from django.http import HttpResponse
+
+
 
 # Create your views here.
 from gestionapp.utils import render_to_pdf, PDFTemplateView, image_as_base64
-
 
 @api_view(['GET', 'POST'])
 def masivo_list(request):
@@ -67,6 +70,15 @@ class DepositoDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Deposito.objects.all()
     serializer_class = DepositoSerializer
 
+
+class MaterialList(generics.ListCreateAPIView):
+    queryset = Material.objects.all()
+    serializer_class = MaterialSerializer
+
+
+class MaterialDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Material.objects.all()
+    serializer_class = MaterialSerializer
 
 class ArticuloList(generics.ListCreateAPIView):
     queryset = Articulo.objects.all()
@@ -199,7 +211,7 @@ class GeneratePDFCotizacionesMaster(PDFTemplateView):
     template_name = 'gestionapp/invoice.html'
 
     def get_context_data(self, **kwargs):
-        maestro_cotizacion = Dcotizacion.objects.filter(master=2)
+        maestro_cotizacion = Dcotizacion.objects.filter(master=1)
 
         return super(GeneratePDFCotizacionesMaster, self).get_context_data(
             pagesize='A4',
@@ -224,7 +236,7 @@ class GeneratePDFCotizacionesDetail(PDFTemplateView):
             fields_db = ['fechaini', 'horaini', 'descripcion', 'cantidad', 'desunimed', 'imptotal']
             headerset = Mcotizacion.objects.filter(id=pk).values()
             queryset = Dcotizacion.objects.filter(master=pk).values()
-            rimptotal = list(Dcotizacion.objects.filter(master=pk).aggregate(Sum('imptotal')).values())[0] or 0
+            rimptotal = 0 #list(Dcotizacion.objects.filter(master=pk).aggregate(Sum('imptotal')).values())[0] or 0
             imagenes = list(Dcotizacion.objects.filter(master=pk).values_list('desunimed')[0]) or ''
             #imagen_obt = list(Unidad.objects.filter(descripcion=imagenes).values_list())
             imagen_obt1 = list(Unidad.objects.values_list('foto1')[0])
@@ -253,3 +265,41 @@ def get_item(dictionary, key):
 class CotizacionEstadoViewSet(ModelViewSet):
     serializer_class = CotizacionEstadoSerializer
     queryset = CotizacionEstado.objects.all()
+
+
+def xexport_users_xls(request):
+        serializer = ClienteSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+def export_users_xls(request):
+    nreport='materiales'
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename='+nreport+'.xls'
+   
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet(nreport)
+
+    # Sheet header, first row
+    row_num = 0
+
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+
+    columns = ['CODIGO', 'DESCRIPCION', 'COLOR', 'UM', ]
+
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+
+    # Sheet body, remaining rows
+    font_style = xlwt.XFStyle()
+
+    rows = Material.objects.all().values_list('codigo', 'descripcion', 'color', 'unimed')
+    for row in rows:
+        row_num += 1
+        for col_num in range(len(row)):
+            ws.write(row_num, col_num, row[col_num], font_style)
+
+    wb.save(response)
+    return response
