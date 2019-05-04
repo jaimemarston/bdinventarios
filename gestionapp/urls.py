@@ -8,7 +8,10 @@ from . import views
 
 router = DefaultRouter()
 router.register(r'mcotizacion', views.CotizacionViewSet)
+router.register(r'mmateriales', views.MaterialesViewSet)
 router.register(r'cotizacion_estado', views.CotizacionEstadoViewSet)
+router.register(r'lista_stock', views.StockViewSet,base_name='put-something-here',)
+
 
 urlpatterns = [
     url(r'^deposito$', views.DepositoList.as_view()),
@@ -34,6 +37,9 @@ urlpatterns = [
     url(r'^dcotizacion$', views.DcotizacionList.as_view()),
     url(r'^dcotizacion/(?P<pk>[0-9]+)$', views.DcotizacionDetail.as_view()),
 
+    url(r'^dmateriales$', views.DmaterialesList.as_view()),
+    url(r'^dmateriales/(?P<pk>[0-9]+)$', views.DmaterialesDetail.as_view()),
+
     url(r'^clientesdireccion$', views.ClientesDireccionlist.as_view()),
     url(r'^clientesdirecciondetail$', views.ClientesDireccionlistdetail.as_view()),
     url(r'^', include(router.urls)),
@@ -44,4 +50,6 @@ urlpatterns = [
     url(r'^generate_html$', TemplateView.as_view(template_name="gestionapp/invoice.html")),
     url(r'^export_xls$',views.export_users_xls, name='materiales'),
 
+    #url(r'^stock$', views.StockprodListMasivo.as_view()),
+    #url(r'^stock$', views.StockViewSet.as_view()),
 ]

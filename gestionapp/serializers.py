@@ -1,14 +1,13 @@
 from rest_framework import serializers
 
 from gestionapp.models import Deposito, Material, Articulo, Cliente, Proveedor, Unidad, Programagastos, Mcotizacion, Dcotizacion, \
-    Clientesdireccion, Banco, CotizacionEstado
+    Clientesdireccion, Banco, CotizacionEstado, MaterialesEstado, Mmateriales, Dmateriales
 
 
 class BancoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Banco
         fields = ('id', 'codigo', 'descripcion')
-
 
 class DepositoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,6 +29,7 @@ class MaterialSerializer(serializers.ModelSerializer):
                    'descolor','stock1','codbarra','stockalm1','stockalm2','stockalm3','afectoigv','preciocosto','precioventa', 
                    'aplicadscto','cc1','descc1','modelo','genero','talla','ruc','desruc','unimed',
                    'desunimed','umdsali','umdsaliconv','tipo')
+
 
 class ArticuloSerializer(serializers.ModelSerializer):
     class Meta:
@@ -87,7 +87,6 @@ class ProveedorSerializer(serializers.ModelSerializer):
       return Cliente.objects.create(**validated_data)
 """
 
-
 class DcotizacionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dcotizacion
@@ -116,6 +115,35 @@ class McotizacionSerializer(serializers.ModelSerializer):
                   'estado', 'grupo', 'posmapa', 'cotizaciones')
 
 
+# Materiales
+
+class DmaterialesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Dmateriales
+        fields = ('id', 'codigo', 'codpro', 'descripcion', 'unimed', 'desunimed', 'cantidad', 'precio', 'impsubtotal',
+                  'impanticipos', 'impdescuentos',
+                  'impvalorventa', 'impisc', 'impigv', 'nvaligv', 'impotroscargos', 'impotrostributos', 'imptotal',
+                  'desgrupo1', 'desgrupo2', 'lugorigen', 'lugdestino', 'opcviaje',
+                  'cc1', 'cc2', 'cc3', 'fechaini', 'fechafin', 'horaini', 'horafin', 'conductor', 'nvuelo',
+                  'proveedor', 'obs', 'tipodoc', 'estado', 'estadodoc', 'posmapa', 'master' )
+
+     
+
+class MmaterialesSerializer(serializers.ModelSerializer):
+    materiales = DmaterialesSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Mmateriales
+        fields = ('id', 'codigo', 'descripcion', 'tipdoc', 'destipdoc', 'seriedoc', 'numerodoc', 'fechadoc',
+                  'fecentrega', 'ruc', 'desruc', 'telruc', 'paisruc', 'dptoruc', 'provruc', 'distruc', 'codpostalruc',
+                  'dirruc', 'conpag', 'desconpag', 'monedapago', 'desmonepago', 'tc_dolares', 'tc_euros', 'tc_yen',
+                  'numeroguia', 'numordserv', 'vendidopor', 'fechapago', 'autorizadosunat', 'impsubtotal',
+                  'impdescuentos',
+                  'impvalorventa', 'impisc', 'impigv', 'nvaligv', 'impotroscargos', 'impotrostributos', 'imptotal',
+                  'cc1', 'cc2', 'cc3', 'fechaini', 'fechafin', 'horaini', 'horafin', 'correoruc', 'unidadtransporte',
+                  'lugorigen', 'lugdestino', 'opcviaje',
+                  'estado', 'grupo', 'posmapa', 'materiales')
+
 
 class ClientesdireccionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -135,4 +163,10 @@ class ClientesdirecciondetalleSerializer(serializers.ModelSerializer):
 class CotizacionEstadoSerializer(serializers.ModelSerializer):
     class Meta:
         model = CotizacionEstado
+        fields = '__all__'
+
+
+class MaterialesEstadoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MaterialesEstado
         fields = '__all__'

@@ -6,14 +6,17 @@ from django.db.models import Sum
 import xlwt
 
 from gestionapp.models import (
-    Deposito, Material, Articulo, Cliente, Proveedor, Unidad, Mcotizacion,
-    Dcotizacion, Clientesdireccion, Banco,
+    Deposito, Material, Articulo, Cliente, Proveedor, Unidad,
+    Mcotizacion,Dcotizacion,Mmateriales,Dmateriales,
+    Clientesdireccion, Banco, MaterialesEstado,
     CotizacionEstado)
 
 from gestionapp.serializers import (
     DepositoSerializer, MaterialSerializer, ArticuloSerializer, ClienteSerializer, ProveedorSerializer, UnidadSerializer,
-    McotizacionSerializer, DcotizacionSerializer, ClientesdireccionSerializer,
-    ClientesdirecciondetalleSerializer, BancoSerializer,
+    McotizacionSerializer, DcotizacionSerializer,
+    MmaterialesSerializer, DmaterialesSerializer,
+    ClientesdireccionSerializer,
+    ClientesdirecciondetalleSerializer, BancoSerializer,MaterialesEstadoSerializer,
     CotizacionEstadoSerializer)
 
 from django.contrib.auth.models import User
@@ -64,7 +67,6 @@ class UnidadDetail(generics.RetrieveUpdateDestroyAPIView):
 class DepositoList(generics.ListCreateAPIView):
     queryset = Deposito.objects.all()
     serializer_class = DepositoSerializer
-
 
 class DepositoDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Deposito.objects.all()
@@ -182,6 +184,25 @@ class DcotizacionDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Dcotizacion.objects.all()
     serializer_class = DcotizacionSerializer
     
+#
+class MmaterialesList(generics.ListCreateAPIView):
+    queryset = Mmateriales.objects.all()
+    serializer_class = MmaterialesSerializer
+       
+
+class MmaterialesDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Mmateriales.objects.all()
+    serializer_class = MmaterialesSerializer
+    
+
+class DmaterialesList(generics.ListCreateAPIView):
+    queryset = Dmateriales.objects.all()
+    serializer_class = DmaterialesSerializer
+
+class DmaterialesDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Dmateriales.objects.all()
+    serializer_class = DmaterialesSerializer
+
 
 class Logout(APIView):
     queryset = User.objects.all()
@@ -205,6 +226,9 @@ class ClientesDireccionlistdetail(generics.ListCreateAPIView):
 class CotizacionViewSet(viewsets.ModelViewSet):
     queryset = Mcotizacion.objects.all()
     serializer_class = McotizacionSerializer
+
+
+
 
 
 class GeneratePDFCotizacionesMaster(PDFTemplateView):
@@ -261,10 +285,48 @@ class GeneratePDFCotizacionesDetail(PDFTemplateView):
 def get_item(dictionary, key):
     return dictionary.get(key)
 
-
 class CotizacionEstadoViewSet(ModelViewSet):
     serializer_class = CotizacionEstadoSerializer
     queryset = CotizacionEstado.objects.all()
+
+class CotizacionViewSet(viewsets.ModelViewSet):
+    queryset = Mcotizacion.objects.all()
+    serializer_class = McotizacionSerializer
+
+#Materiales
+
+class MaterialesEstadoViewSet(ModelViewSet):
+    serializer_class = MaterialesEstadoSerializer
+    queryset = MaterialesEstado.objects.all()
+
+class MaterialesViewSet(viewsets.ModelViewSet):
+    queryset = Mmateriales.objects.all()
+    serializer_class = MmaterialesSerializer
+
+
+class StockViewSet(viewsets.ModelViewSet):
+   # queryset = Blogpost.objects.all().order_by('date')
+    serializer_class = ArticuloSerializer
+
+    def get_queryset(self):
+        # Chances are, you're doing something more advanced here 
+        # like filtering.
+        Articulo.objects.all()
+    #https://www.peterbe.com/plog/efficient-m2m-django-rest-framework
+    def list(self, request, *args, **kwargs):
+        #response = super().list(request, *args, **kwargs)
+        #qs = self.get_queryset()
+        
+        category_names = {}
+        for category in Articulo.objects.all():
+            category_names[category.id] = category.descripcion
+
+        usernames = [user.descripcion for user in Articulo.objects.all()]
+
+        return Response(category_names)
+               
+        #return response
+
 
 
 def xexport_users_xls(request):

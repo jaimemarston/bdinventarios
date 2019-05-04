@@ -75,7 +75,7 @@ class Camposcomunes_detaildoc(models.Model):
     descripcion = models.CharField(max_length=150, null=True, blank=True)
     unimed = models.CharField(max_length=60, null=True, blank=True)
     desunimed = models.CharField(max_length=60, null=True, blank=True)
-    cantidad = models.IntegerField(default=0, null=True, blank=True)
+    cantidad = models.DecimalField(default=0,max_digits=15, decimal_places=4)
     precio = models.IntegerField(default=0, null=True, blank=True)
     impsubtotal = models.IntegerField(default=0, null=True, blank=True)
     impanticipos = models.IntegerField(default=0, null=True, blank=True)
@@ -198,7 +198,7 @@ class Programagasto(models.Model):
 class Material(models.Model):
     codigo = models.CharField(max_length=30)
     descripcion = models.CharField(max_length=60)
-    cantidad = models.IntegerField(default=0)
+    cantidad = models.DecimalField(default=0,max_digits=15, decimal_places=4)
     color = models.CharField(max_length=2, default=0, choices=COLORES)
     descolor = models.CharField(max_length=60, blank=True, null=True)
     deposito = models.ForeignKey(Deposito, null=True, on_delete=models.SET_NULL)
@@ -227,7 +227,7 @@ class Material(models.Model):
 class Articulo(models.Model):
     codigo = models.CharField(max_length=30)
     descripcion = models.CharField(max_length=60)
-    cantidad = models.IntegerField(default=0)
+    cantidad = models.DecimalField(default=0,max_digits=15, decimal_places=4)
     color = models.CharField(max_length=2, default=0, choices=COLORES)
     descolor = models.CharField(max_length=60, blank=True, null=True)
     deposito = models.ForeignKey(Deposito, null=True, on_delete=models.SET_NULL)
@@ -284,7 +284,7 @@ class Chofer(Camposcomunes_personal, Camposcomunes_auditoria):
     pass
 
 
-# ARCHIVOS DE MOVIMIENTO
+# ARCHIVOS DE MOVIMIENTO COTIZACIONES O PRODUCTOS
 
 class Mcotizacion(Camposcomunes_masterdoc, Camposcomunes_auditoria):
     pass
@@ -292,6 +292,16 @@ class Mcotizacion(Camposcomunes_masterdoc, Camposcomunes_auditoria):
 
 class Dcotizacion(Camposcomunes_detaildoc, Camposcomunes_auditoria):
     master = models.ForeignKey(Mcotizacion, related_name='cotizaciones', on_delete=models.CASCADE, null=True)
+
+
+# ARCHIVOS DE MOVIMIENTO MATERIALES
+
+class Mmateriales(Camposcomunes_masterdoc, Camposcomunes_auditoria):
+    pass
+
+
+class Dmateriales(Camposcomunes_detaildoc, Camposcomunes_auditoria):
+    master = models.ForeignKey(Mmateriales, related_name='materiales', on_delete=models.CASCADE, null=True)
 
 
 class Mguia(models.Model):
@@ -324,5 +334,9 @@ class Clientesdireccion(models.Model):
 
 
 class CotizacionEstado(models.Model):
+    name = models.CharField(max_length=254)
+    color = models.CharField(max_length=100)
+
+class MaterialesEstado(models.Model):
     name = models.CharField(max_length=254)
     color = models.CharField(max_length=100)
