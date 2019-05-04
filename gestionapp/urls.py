@@ -10,8 +10,7 @@ router = DefaultRouter()
 router.register(r'mcotizacion', views.CotizacionViewSet)
 router.register(r'mmateriales', views.MaterialesViewSet)
 router.register(r'cotizacion_estado', views.CotizacionEstadoViewSet)
-router.register(r'lista_stock', views.StockViewSet,base_name='put-something-here',)
-
+router.register(r'lista_stock', views.StockViewSet, base_name='put-something-here', )
 
 urlpatterns = [
     url(r'^deposito$', views.DepositoList.as_view()),
@@ -48,8 +47,8 @@ urlpatterns = [
     url(r'^generate_pdf$', views.GeneratePDFCotizacionesDetail.as_view()),
     url(r'^generate_pdf/(?P<pk>\d+)/$', views.GeneratePDFCotizacionesDetail.as_view()),
     url(r'^generate_html$', TemplateView.as_view(template_name="gestionapp/invoice.html")),
-    url(r'^export_xls$',views.export_users_xls, name='materiales'),
+    url(r'^export_xls$', views.export_users_xls, name='materiales'),
 
-    #url(r'^stock$', views.StockprodListMasivo.as_view()),
-    #url(r'^stock$', views.StockViewSet.as_view()),
+    # url(r'^stock$', views.StockprodListMasivo.as_view()),
+    # url(r'^stock$', views.StockViewSet.as_view()),
 ]

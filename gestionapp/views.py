@@ -7,16 +7,17 @@ import xlwt
 
 from gestionapp.models import (
     Deposito, Material, Articulo, Cliente, Proveedor, Unidad,
-    Mcotizacion,Dcotizacion,Mmateriales,Dmateriales,
+    Mcotizacion, Dcotizacion, Mmateriales, Dmateriales,
     Clientesdireccion, Banco, MaterialesEstado,
     CotizacionEstado)
 
 from gestionapp.serializers import (
-    DepositoSerializer, MaterialSerializer, ArticuloSerializer, ClienteSerializer, ProveedorSerializer, UnidadSerializer,
+    DepositoSerializer, MaterialSerializer, ArticuloSerializer, ClienteSerializer, ProveedorSerializer,
+    UnidadSerializer,
     McotizacionSerializer, DcotizacionSerializer,
     MmaterialesSerializer, DmaterialesSerializer,
     ClientesdireccionSerializer,
-    ClientesdirecciondetalleSerializer, BancoSerializer,MaterialesEstadoSerializer,
+    ClientesdirecciondetalleSerializer, BancoSerializer, MaterialesEstadoSerializer,
     CotizacionEstadoSerializer)
 
 from django.contrib.auth.models import User
@@ -30,10 +31,9 @@ import base64
 from django.templatetags.static import static
 from django.http import HttpResponse
 
-
-
 # Create your views here.
 from gestionapp.utils import render_to_pdf, PDFTemplateView, image_as_base64
+
 
 @api_view(['GET', 'POST'])
 def masivo_list(request):
@@ -46,7 +46,6 @@ def masivo_list(request):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
 
 
 class BancoList(generics.ListCreateAPIView):
@@ -68,6 +67,7 @@ class DepositoList(generics.ListCreateAPIView):
     queryset = Deposito.objects.all()
     serializer_class = DepositoSerializer
 
+
 class DepositoDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Deposito.objects.all()
     serializer_class = DepositoSerializer
@@ -82,6 +82,7 @@ class MaterialDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Material.objects.all()
     serializer_class = MaterialSerializer
 
+
 class ArticuloList(generics.ListCreateAPIView):
     queryset = Articulo.objects.all()
     serializer_class = ArticuloSerializer
@@ -95,15 +96,13 @@ class ArticuloDetail(generics.RetrieveUpdateDestroyAPIView):
 class ClienteList(generics.ListCreateAPIView):
     queryset = Cliente.objects.all()
     serializer_class = ClienteSerializer
-    
+
     # bloquea permisos para usar token
     # permission_classes = (IsAuthenticated,)
     def perform_create(self, serializer):
         # guarda aud_idusu automatically en tabla.
-        
-        serializer.save(aud_idusu=self.request.user.username)
 
-    
+        serializer.save(aud_idusu=self.request.user.username)
 
     # para filtrar datos
     """
@@ -125,7 +124,8 @@ class ClienteDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def perform_update(self, serializer):
         # guarda aud_idusu automatically en tabla.
-        serializer.save(idioma='español',pais='Peru')
+        serializer.save(idioma='español', pais='Peru')
+
 
 class ClienteListMasivo(viewsets.ModelViewSet):
     queryset = Cliente.objects.all()
@@ -169,35 +169,38 @@ class ProveedorListMasivo(viewsets.ModelViewSet):
 class McotizacionList(generics.ListCreateAPIView):
     queryset = Mcotizacion.objects.all()
     serializer_class = McotizacionSerializer
-       
+
 
 class McotizacionDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Mcotizacion.objects.all()
     serializer_class = McotizacionSerializer
-    
+
 
 class DcotizacionList(generics.ListCreateAPIView):
     queryset = Dcotizacion.objects.all()
     serializer_class = DcotizacionSerializer
 
+
 class DcotizacionDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Dcotizacion.objects.all()
     serializer_class = DcotizacionSerializer
-    
+
+
 #
 class MmaterialesList(generics.ListCreateAPIView):
     queryset = Mmateriales.objects.all()
     serializer_class = MmaterialesSerializer
-       
+
 
 class MmaterialesDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Mmateriales.objects.all()
     serializer_class = MmaterialesSerializer
-    
+
 
 class DmaterialesList(generics.ListCreateAPIView):
     queryset = Dmateriales.objects.all()
     serializer_class = DmaterialesSerializer
+
 
 class DmaterialesDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Dmateriales.objects.all()
@@ -226,9 +229,6 @@ class ClientesDireccionlistdetail(generics.ListCreateAPIView):
 class CotizacionViewSet(viewsets.ModelViewSet):
     queryset = Mcotizacion.objects.all()
     serializer_class = McotizacionSerializer
-
-
-
 
 
 class GeneratePDFCotizacionesMaster(PDFTemplateView):
@@ -260,9 +260,9 @@ class GeneratePDFCotizacionesDetail(PDFTemplateView):
             fields_db = ['fechaini', 'horaini', 'descripcion', 'cantidad', 'desunimed', 'imptotal']
             headerset = Mcotizacion.objects.filter(id=pk).values()
             queryset = Dcotizacion.objects.filter(master=pk).values()
-            rimptotal = 0 #list(Dcotizacion.objects.filter(master=pk).aggregate(Sum('imptotal')).values())[0] or 0
+            rimptotal = 0  # list(Dcotizacion.objects.filter(master=pk).aggregate(Sum('imptotal')).values())[0] or 0
             imagenes = list(Dcotizacion.objects.filter(master=pk).values_list('desunimed')[0]) or ''
-            #imagen_obt = list(Unidad.objects.filter(descripcion=imagenes).values_list())
+            # imagen_obt = list(Unidad.objects.filter(descripcion=imagenes).values_list())
             imagen_obt1 = list(Unidad.objects.values_list('foto1')[0])
             imagen_obt2 = list(Unidad.objects.values_list('foto2')[0])
 
@@ -285,19 +285,23 @@ class GeneratePDFCotizacionesDetail(PDFTemplateView):
 def get_item(dictionary, key):
     return dictionary.get(key)
 
+
 class CotizacionEstadoViewSet(ModelViewSet):
     serializer_class = CotizacionEstadoSerializer
     queryset = CotizacionEstado.objects.all()
+
 
 class CotizacionViewSet(viewsets.ModelViewSet):
     queryset = Mcotizacion.objects.all()
     serializer_class = McotizacionSerializer
 
-#Materiales
+
+# Materiales
 
 class MaterialesEstadoViewSet(ModelViewSet):
     serializer_class = MaterialesEstadoSerializer
     queryset = MaterialesEstado.objects.all()
+
 
 class MaterialesViewSet(viewsets.ModelViewSet):
     queryset = Mmateriales.objects.all()
@@ -305,41 +309,44 @@ class MaterialesViewSet(viewsets.ModelViewSet):
 
 
 class StockViewSet(viewsets.ModelViewSet):
-   # queryset = Blogpost.objects.all().order_by('date')
+    # queryset = Blogpost.objects.all().order_by('date')
     serializer_class = ArticuloSerializer
 
     def get_queryset(self):
         # Chances are, you're doing something more advanced here 
         # like filtering.
         Articulo.objects.all()
-    #https://www.peterbe.com/plog/efficient-m2m-django-rest-framework
-    def list(self, request, *args, **kwargs):
-        #response = super().list(request, *args, **kwargs)
-        #qs = self.get_queryset()
-        
-        category_names = {}
-        for category in Articulo.objects.all():
-            category_names[category.id] = category.descripcion
 
-        usernames = [user.descripcion for user in Articulo.objects.all()]
+    # https://www.peterbe.com/plog/efficient-m2m-django-rest-framework
+    def list(self, request, *args, **kwargs):
+        # response = super().list(request, *args, **kwargs)
+        # qs = self.get_queryset()
+
+        category_names = []
+        for category in Articulo.objects.all():
+            detail_cotizacion = Dcotizacion.objects.filter(descripcion=category.descripcion).aggregate(Sum('cantidad'))
+            data = {'codigo': category.id,
+                    'description': category.descripcion,
+                    'cantidad': detail_cotizacion['cantidad__sum']}
+            category_names.append(data)
 
         return Response(category_names)
-               
-        #return response
 
+        # return response
 
 
 def xexport_users_xls(request):
-        serializer = ClienteSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    serializer = ClienteSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 def export_users_xls(request):
-    nreport='materiales'
+    nreport = 'materiales'
     response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename='+nreport+'.xls'
-   
+    response['Content-Disposition'] = 'attachment; filename=' + nreport + '.xls'
+
     wb = xlwt.Workbook(encoding='utf-8')
     ws = wb.add_sheet(nreport)
 

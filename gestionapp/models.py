@@ -75,7 +75,7 @@ class Camposcomunes_detaildoc(models.Model):
     descripcion = models.CharField(max_length=150, null=True, blank=True)
     unimed = models.CharField(max_length=60, null=True, blank=True)
     desunimed = models.CharField(max_length=60, null=True, blank=True)
-    cantidad = models.DecimalField(default=0,max_digits=15, decimal_places=4)
+    cantidad = models.DecimalField(default=0, max_digits=15, decimal_places=4)
     precio = models.IntegerField(default=0, null=True, blank=True)
     impsubtotal = models.IntegerField(default=0, null=True, blank=True)
     impanticipos = models.IntegerField(default=0, null=True, blank=True)
@@ -105,8 +105,6 @@ class Camposcomunes_detaildoc(models.Model):
     tipodoc = models.CharField(max_length=50, null=True, blank=True)
     obs = models.CharField(max_length=50, null=True, blank=True)
     estadodoc = models.ForeignKey('CotizacionEstado', blank=True, null=True, on_delete=models.CASCADE)
-    
-    
 
     class Meta:
         abstract = True
@@ -155,7 +153,6 @@ class Camposcomunes_personal(models.Model):
     pais = models.CharField(max_length=50, blank=True, null=True)
     idioma = models.CharField(max_length=50, blank=True, null=True)
 
-
     class Meta:
         abstract = True
 
@@ -176,7 +173,7 @@ class Unidad(models.Model):
     fechafin = models.DateField(null=True, blank=True)
     foto1 = models.ImageField(upload_to='unidad', null=True, blank=True)
     foto2 = models.ImageField(upload_to='unidad', null=True, blank=True)
-    
+
 
 # Programa gastos,Mantenimiento para unidades
 class Programagastos(models.Model):
@@ -198,7 +195,7 @@ class Programagasto(models.Model):
 class Material(models.Model):
     codigo = models.CharField(max_length=30)
     descripcion = models.CharField(max_length=60)
-    cantidad = models.DecimalField(default=0,max_digits=15, decimal_places=4)
+    cantidad = models.DecimalField(default=0, max_digits=15, decimal_places=4)
     color = models.CharField(max_length=2, default=0, choices=COLORES)
     descolor = models.CharField(max_length=60, blank=True, null=True)
     deposito = models.ForeignKey(Deposito, null=True, on_delete=models.SET_NULL)
@@ -222,12 +219,13 @@ class Material(models.Model):
     desunimed = models.CharField(max_length=30, blank=True, null=True)
     umdsali = models.CharField(max_length=30, blank=True, null=True)
     umdsaliconv = models.CharField(max_length=30, blank=True, null=True)
-    tipo = models.CharField(max_length=60, blank=True, null=True) 
+    tipo = models.CharField(max_length=60, blank=True, null=True)
+
 
 class Articulo(models.Model):
     codigo = models.CharField(max_length=30)
     descripcion = models.CharField(max_length=60)
-    cantidad = models.DecimalField(default=0,max_digits=15, decimal_places=4)
+    cantidad = models.DecimalField(default=0, max_digits=15, decimal_places=4)
     color = models.CharField(max_length=2, default=0, choices=COLORES)
     descolor = models.CharField(max_length=60, blank=True, null=True)
     deposito = models.ForeignKey(Deposito, null=True, on_delete=models.SET_NULL)
@@ -251,8 +249,9 @@ class Articulo(models.Model):
     desunimed = models.CharField(max_length=30, blank=True, null=True)
     umdsali = models.CharField(max_length=30, blank=True, null=True)
     umdsaliconv = models.CharField(max_length=30, blank=True, null=True)
-    tipo = models.CharField(max_length=60, blank=True, null=True) 
-      
+    tipo = models.CharField(max_length=60, blank=True, null=True)
+
+
 class Centrodecosto1(models.Model):
     codigo = models.IntegerField()
     descripcion = models.CharField(max_length=60, blank=True, null=True)
@@ -336,6 +335,7 @@ class Clientesdireccion(models.Model):
 class CotizacionEstado(models.Model):
     name = models.CharField(max_length=254)
     color = models.CharField(max_length=100)
+
 
 class MaterialesEstado(models.Model):
     name = models.CharField(max_length=254)
