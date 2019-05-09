@@ -95,7 +95,7 @@ class DcotizacionSerializer(serializers.ModelSerializer):
                   'impvalorventa', 'impisc', 'impigv', 'nvaligv', 'impotroscargos', 'impotrostributos', 'imptotal',
                   'desgrupo1', 'desgrupo2', 'lugorigen', 'lugdestino', 'opcviaje',
                   'cc1', 'cc2', 'cc3', 'fechaini', 'fechafin', 'horaini', 'horafin', 'conductor', 'nvuelo',
-                  'proveedor', 'obs', 'tipodoc', 'estado', 'estadodoc', 'posmapa', 'master' )
+                  'proveedor', 'obs', 'tipodoc', 'estado', 'estadodoc', 'posmapa','modelo','genero','talla','tipo', 'master' )
 
      
 
@@ -125,7 +125,7 @@ class DmaterialesSerializer(serializers.ModelSerializer):
                   'impvalorventa', 'impisc', 'impigv', 'nvaligv', 'impotroscargos', 'impotrostributos', 'imptotal',
                   'desgrupo1', 'desgrupo2', 'lugorigen', 'lugdestino', 'opcviaje',
                   'cc1', 'cc2', 'cc3', 'fechaini', 'fechafin', 'horaini', 'horafin', 'conductor', 'nvuelo',
-                  'proveedor', 'obs', 'tipodoc', 'estado', 'estadodoc', 'posmapa', 'master' )
+                  'proveedor', 'obs', 'tipodoc', 'estado', 'estadodoc', 'posmapa','modelo','genero','talla','tipo', 'master' )
 
      
 

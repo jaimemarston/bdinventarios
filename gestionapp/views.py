@@ -251,32 +251,142 @@ class GeneratePDFCotizacionesDetail(PDFTemplateView):
 
     def get_context_data(self, pk=None, *args, **kwargs):
         if pk is None:
-            fields = ['Fecha', 'Hora', 'Descripcion', 'PAX', 'transporte', 'Total']
-            fields_db = ['fechaini', 'horaini', 'descripcion', 'cantidad', 'desunimed', 'imptotal']
+            fields = ['CODIGO', 'DESCRIPCION', 'MEDIDA','PRECIO','CANTIDAD','TOTAL']
+            fields_db = ['codpro', 'descripcion','desunimed',  'precio', 'cantidad', 'imptotal']
+            rimptotal = 'INVENTARIO INICIAL'
             headerset = Mcotizacion.objects.all().values()
             queryset = Mcotizacion.objects.all().values()
+            imagen_obt1 = ''
+            imagen_obt2 = ''
         else:
-            fields = ['Fecha', 'Hora', 'Descripcion', 'PAX', 'Transporte', 'Total']
-            fields_db = ['fechaini', 'horaini', 'descripcion', 'cantidad', 'desunimed', 'imptotal']
+            fields = ['CODIGO', 'TIPO','GENERO','MODELO','TALLA','COLOR', 'MEDIDA','PRECIO','CANTIDAD','TOTAL']
+            fields_db = ['codpro', 'tipo','genero','modelo','talla','descolor','desunimed',  'precio', 'cantidad', 'imptotal']
+
+
+            fields_res = ['genero', 'cantidad__sum','imptotal__sum']
             headerset = Mcotizacion.objects.filter(id=pk).values()
-            queryset = Dcotizacion.objects.filter(master=pk).values()
-            rimptotal = 0  # list(Dcotizacion.objects.filter(master=pk).aggregate(Sum('imptotal')).values())[0] or 0
+            
+            detail_total = Dcotizacion.objects.filter(master=pk).aggregate(Sum('imptotal'),Sum('cantidad'))
+            
+            queryset1 = Dcotizacion.objects.filter(master=pk).values().order_by('talla')
+            nestado = list(Mcotizacion.objects.filter(id=pk).values_list('estado')[0])[0]
+            resumen = Dcotizacion.objects.filter(master=pk).values('genero').annotate(Sum('cantidad'),Sum('imptotal'))
+            
+            choices = {1: 'Inventario Inicial', 2: 'Ingreso Producto',3: 'Salida Producto',4: 'Anulado'}
+            seltipo = choices.get(nestado, 'default')
+            
             imagenes = list(Dcotizacion.objects.filter(master=pk).values_list('desunimed')[0]) or ''
             # imagen_obt = list(Unidad.objects.filter(descripcion=imagenes).values_list())
-            imagen_obt1 = list(Unidad.objects.values_list('foto1')[0])
-            imagen_obt2 = list(Unidad.objects.values_list('foto2')[0])
+
+            category_names = []
+            for det in queryset1:
+                detail_cotizacion = list(Articulo.objects.filter(codigo = det['codpro']).values_list('tipo','genero','modelo','talla','descolor')[0])
+                data = {'codpro': det['codpro'],
+                       'descripcion':det['descripcion'], 
+                       'desunimed':det['desunimed'],
+                       'precio':det['precio'],
+                       'tipo':detail_cotizacion[0],
+                       'genero':detail_cotizacion[1],
+                       'modelo':detail_cotizacion[2],
+                       'talla':detail_cotizacion[3],
+                       'descolor':detail_cotizacion[4],
+                       'cantidad':det['cantidad'],
+                       'imptotal':det['imptotal']}
+                category_names.append(data)
+
+            queryset = category_names
+
+            imagen_obt1 = ''
+            imagen_obt2 = '' 
 
         return super(GeneratePDFCotizacionesDetail, self).get_context_data(
             pagesize='A4',
-            title='Cotizacion Alitour',
+            title='Control de Productos',
             today=now(),
             cotizacion=queryset,
             headerset=headerset,
             fields=fields,
             fields_db=fields_db,
-            resultado_total=rimptotal,
+            fields_res=fields_res,
+            tipo_movimiento=seltipo,
+            resultado_total=detail_total['imptotal__sum'],
+            resultado_cantidad=detail_total['cantidad__sum'],
             muestra_imagenes1=imagen_obt1,
             muestra_imagenes2=imagen_obt2,
+            resumen_detalle=resumen,
+           
+            **kwargs
+        )
+
+class GeneratePDFMaterialesDetail(PDFTemplateView):
+    template_name = 'gestionapp/invoicemat.html'
+
+    def get_context_data(self, pk=None, *args, **kwargs):
+        if pk is None:
+            fields = ['CODIGO', 'DESCRIPCION', 'MEDIDA','PRECIO','CANTIDAD','TOTAL']
+            fields_db = ['codpro', 'descripcion','desunimed',  'precio', 'cantidad', 'imptotal']
+            rimptotal = 'INVENTARIO INICIAL'
+            headerset = Mmateriales.objects.all().values()
+            queryset = Mmateriales.objects.all().values()
+            imagen_obt1 = ''
+            imagen_obt2 = ''
+        else:
+            fields = ['CODIGO', 'TIPO','COLOR', 'MEDIDA','PRECIO','CANTIDAD','TOTAL']
+            fields_db = ['codpro', 'tipo','descolor','desunimed',  'precio', 'cantidad', 'imptotal']
+
+
+            fields_res = ['tipo', 'cantidad__sum','imptotal__sum']
+            headerset = Mmateriales.objects.filter(id=pk).values()
+            
+            detail_total = Dmateriales.objects.filter(master=pk).aggregate(Sum('imptotal'),Sum('cantidad'))
+            
+            queryset1 = Dmateriales.objects.filter(master=pk).values().order_by('talla')
+            nestado = list(Mmateriales.objects.filter(id=pk).values_list('estado')[0])[0]
+            resumen = Dmateriales.objects.filter(master=pk).values('tipo').annotate(Sum('cantidad'),Sum('imptotal'))
+            
+            choices = {1: 'Inventario Inicial', 2: 'Ingreso Producto',3: 'Salida Producto',4: 'Anulado'}
+            seltipo = choices.get(nestado, 'default')
+            
+            imagenes = list(Dmateriales.objects.filter(master=pk).values_list('desunimed')[0]) or ''
+            # imagen_obt = list(Unidad.objects.filter(descripcion=imagenes).values_list())
+
+            category_names = []
+            for det in queryset1:
+                detail_cotizacion = list(Material.objects.filter(codigo = det['codpro']).values_list('tipo','genero','modelo','talla','descolor')[0])
+                data = {'codpro': det['codpro'],
+                       'descripcion':det['descripcion'], 
+                       'desunimed':det['desunimed'],
+                       'precio':det['precio'],
+                       'tipo':detail_cotizacion[0],
+                       'genero':detail_cotizacion[1],
+                       'modelo':detail_cotizacion[2],
+                       'talla':detail_cotizacion[3],
+                       'descolor':detail_cotizacion[4],
+                       'cantidad':det['cantidad'],
+                       'imptotal':det['imptotal']}
+                category_names.append(data)
+
+            queryset = category_names
+
+            imagen_obt1 = ''
+            imagen_obt2 = '' 
+
+        return super(GeneratePDFMaterialesDetail, self).get_context_data(
+            pagesize='A4',
+            title='Control de Productos',
+            today=now(),
+            cotizacion=queryset,
+            headerset=headerset,
+            fields=fields,
+            fields_db=fields_db,
+            fields_res=fields_res,
+            tipo_movimiento=seltipo,
+            resultado_total=detail_total['imptotal__sum'],
+            resultado_cantidad=detail_total['cantidad__sum'],
+            muestra_imagenes1=imagen_obt1,
+            muestra_imagenes2=imagen_obt2,
+            resumen_detalle=resumen,
+           
             **kwargs
         )
 
@@ -308,6 +418,53 @@ class MaterialesViewSet(viewsets.ModelViewSet):
     serializer_class = MmaterialesSerializer
 
 
+class lista_articulos_detalleViewSet(viewsets.ModelViewSet):
+    # queryset = Blogpost.objects.all().order_by('date')
+    serializer_class = ArticuloSerializer
+
+    def get_queryset(self):
+        # Chances are, you're doing something more advanced here 
+        # like filtering.
+        Articulo.objects.all()
+
+    # https://www.peterbe.com/plog/efficient-m2m-django-rest-framework
+    def list(self, request, *args, **kwargs):
+        # response = super().list(request, *args, **kwargs)
+        # qs = self.get_queryset()
+
+        category_names = []
+        for category in Articulo.objects.all():
+            detail_cotizacion = Dcotizacion.objects.filter(descripcion=category.descripcion).aggregate(Sum('cantidad'))
+            data = {'codigo': category.id,
+                    'description': category.descripcion,
+                    'cantidad': detail_cotizacion['cantidad__sum']}
+            category_names.append(data)
+
+        return Response(category_names)
+
+class listaarticuloViewSet(viewsets.ModelViewSet):
+    # queryset = Blogpost.objects.all().order_by('date')
+    serializer_class = ArticuloSerializer
+
+    def get_queryset(self):
+        # Chances are, you're doing something more advanced here 
+        # like filtering.
+        Articulo.objects.all()
+
+    # https://www.peterbe.com/plog/efficient-m2m-django-rest-framework
+    def list(self, request, *args, **kwargs):
+        # response = super().list(request, *args, **kwargs)
+        # qs = self.get_queryset()
+
+        category_names = []
+        for category in Articulo.objects.all():
+            data = {'codigo': category.id,
+                    'description': category.descripcion}
+            category_names.append(data)
+
+        return Response(category_names)
+
+        # return response
 class StockViewSet(viewsets.ModelViewSet):
     # queryset = Blogpost.objects.all().order_by('date')
     serializer_class = ArticuloSerializer
@@ -333,13 +490,6 @@ class StockViewSet(viewsets.ModelViewSet):
         return Response(category_names)
 
         # return response
-
-
-def xexport_users_xls(request):
-    serializer = ClienteSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 def export_users_xls(request):
