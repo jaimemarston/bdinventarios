@@ -5,6 +5,7 @@ from rest_framework.viewsets import ModelViewSet
 from django.db.models import Sum
 import xlwt
 
+
 from gestionapp.models import (
     Deposito, Material, Articulo, Cliente, Proveedor, Unidad,
     Mcotizacion, Dcotizacion, Mmateriales, Dmateriales,
@@ -33,6 +34,7 @@ from django.http import HttpResponse
 
 # Create your views here.
 from gestionapp.utils import render_to_pdf, PDFTemplateView, image_as_base64
+
 
 
 @api_view(['GET', 'POST'])
@@ -431,13 +433,18 @@ class lista_articulos_detalleViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         # response = super().list(request, *args, **kwargs)
         # qs = self.get_queryset()
-
         category_names = []
-        for category in Articulo.objects.all():
-            detail_cotizacion = Dcotizacion.objects.filter(descripcion=category.descripcion).aggregate(Sum('cantidad'))
-            data = {'codigo': category.id,
+        for category in Dcotizacion.objects.all():
+            data = {'codigo': category.codpro,
                     'description': category.descripcion,
-                    'cantidad': detail_cotizacion['cantidad__sum']}
+                    'cantidad': category.cantidad,
+                    "cotizaciones": [
+                                     {
+                                        "id": 7,
+                                        "codigo": 1,
+                                        "descripcion":'ingreso de material',
+                                        "cantidad":100}]}
+                                        
             category_names.append(data)
 
         return Response(category_names)
@@ -478,15 +485,9 @@ class StockViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         # response = super().list(request, *args, **kwargs)
         # qs = self.get_queryset()
+        #choices = {1: 'Inventario Inicial', 2: 'Ingreso Producto',3: 'Salida Producto',4: 'Anulado'}
 
-        category_names = []
-        for category in Articulo.objects.all():
-            detail_cotizacion = Dcotizacion.objects.filter(descripcion=category.descripcion).aggregate(Sum('cantidad'))
-            data = {'codigo': category.id,
-                    'description': category.descripcion,
-                    'cantidad': detail_cotizacion['cantidad__sum']}
-            category_names.append(data)
-
+        category_names=lista_stock()
         return Response(category_names)
 
         # return response
@@ -522,3 +523,86 @@ def export_users_xls(request):
 
     wb.save(response)
     return response
+
+
+def export_xls_stock(request): 
+    nreport = 'stock_materiales'
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename=' + nreport + '.xls'
+   
+   # Workbook is created 
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet(nreport)
+
+    # Sheet header, first row
+    row_num = 0
+
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+
+        # Sheet body, remaining rows
+    font_style = xlwt.XFStyle()
+
+    category_names=lista_stock()
+
+    columns = ['CODIGO', 'DESCRIPCION', 'INVINICIAL', 'INGRESOS', 'SALIDAS','SALDOACTUAL' ]
+
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+
+    # add_sheet is used to create sheet. 
+    for row in category_names:
+        row_num += 1
+        #print(row_num,col_num,row[col_num],font_style)
+        ws.write(row_num,0,row['codigo'],font_style)
+        ws.write(row_num,1,row['descripcion'],font_style)
+        ws.write(row_num,2,row['inv.inicial'],font_style)
+        ws.write(row_num,3,row['ingresos'],font_style)
+        ws.write(row_num,4,row['salidas'],font_style)
+        ws.write(row_num,5,row['saldo.actual'],font_style)
+            
+            #ws.write(row_num, col_num, row[col_num], font_style)
+    
+    
+    
+    wb.save(response)
+    return response
+
+    
+def lista_stock():
+    category_names = []
+
+    
+    for category in Articulo.objects.all().order_by('talla'):
+            xinvini=0
+            xingresos=0
+            xsalidas=0
+            xsaldo = 0
+            for estado in Mcotizacion.objects.all():
+                    nestado = estado.estado
+                    pkmaster = estado.id
+
+                    detail_cotizacion = Dcotizacion.objects.filter(codpro=category.codigo,master=pkmaster).aggregate(Sum('cantidad'))
+
+                    valor_cantidad = detail_cotizacion['cantidad__sum'] if  type(detail_cotizacion['cantidad__sum'])   != type(None) else 0 
+                    
+                    invini  = valor_cantidad if nestado==1 else 0
+                    ingresos= valor_cantidad if nestado==2 else 0 
+                    salidas = valor_cantidad if nestado==3 else 0
+                    
+                    xinvini   += invini     
+                    xingresos += ingresos 
+                    xsalidas  += salidas                    
+            xsaldo    = (xinvini+xingresos)-xsalidas
+            #print (category.codigo,valor_cantidad,nestado,xinvini,xingresos,xsalidas)
+            data = {'codigo': category.codigo,
+                    'descripcion': category.descripcion,
+                    'inv.inicial':   xinvini,
+                    'ingresos':  xingresos ,
+                    'salidas':   xsalidas ,
+                    'saldo.actual':     xsaldo,
+                            }
+
+            category_names.append(data)
+    
+    return category_names

@@ -12,7 +12,7 @@ router.register(r'mmateriales', views.MaterialesViewSet)
 router.register(r'cotizacion_estado', views.CotizacionEstadoViewSet)
 router.register(r'lista_stock', views.StockViewSet, base_name='put-something-here', )
 router.register(r'lista_articulos', views.listaarticuloViewSet, base_name='put-something-here', )
-router.register(r'lista_articulos_detalle', views.listaarticuloViewSet, base_name='put-something-here', )
+router.register(r'lista_articulos_detalle', views.lista_articulos_detalleViewSet, base_name='put-something-here', )
 
 urlpatterns = [
     url(r'^deposito$', views.DepositoList.as_view()),
@@ -51,4 +51,5 @@ urlpatterns = [
     url(r'^generatemat_pdf/(?P<pk>\d+)/$', views.GeneratePDFMaterialesDetail.as_view()),
     url(r'^generate_html$', TemplateView.as_view(template_name="gestionapp/invoice.html")),
     url(r'^export_xls$', views.export_users_xls, name='materiales'),
+    url(r'^xls_stock$', views.export_xls_stock, name='materiales'),
 ]
