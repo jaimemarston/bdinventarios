@@ -282,10 +282,10 @@ class GeneratePDFCotizacionesDetail(PDFTemplateView):
 
             category_names = []
             for det in queryset1:
-                detail_cotizacion = list(Articulo.objects.filter(codigo = det['codpro']).values_list('tipo','genero','modelo','talla','descolor')[0])
+                detail_cotizacion = list(Articulo.objects.filter(codigo = det['codpro']).values_list('tipo','genero','modelo','talla','descolor','unimed')[0])
                 data = {'codpro': det['codpro'],
                        'descripcion':det['descripcion'], 
-                       'desunimed':det['desunimed'],
+                       'desunimed':detail_cotizacion[5],
                        'precio':det['precio'],
                        'tipo':detail_cotizacion[0],
                        'genero':detail_cotizacion[1],
@@ -293,7 +293,7 @@ class GeneratePDFCotizacionesDetail(PDFTemplateView):
                        'talla':detail_cotizacion[3],
                        'descolor':detail_cotizacion[4],
                        'cantidad':det['cantidad'],
-                       'imptotal':det['imptotal']}
+                       'imptotal':round(det['imptotal'],2)}
                 category_names.append(data)
 
             queryset = category_names
