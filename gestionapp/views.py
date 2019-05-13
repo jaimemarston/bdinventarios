@@ -434,19 +434,51 @@ class lista_articulos_detalleViewSet(viewsets.ModelViewSet):
         # response = super().list(request, *args, **kwargs)
         # qs = self.get_queryset()
         category_names = []
-        for category in Dcotizacion.objects.all():
-            data = {'codigo': category.codpro,
-                    'description': category.descripcion,
-                    'cantidad': category.cantidad,
-                    "cotizaciones": [
-                                     {
-                                        "id": 7,
-                                        "codigo": 1,
-                                        "descripcion":'ingreso de material',
-                                        "cantidad":100}]}
-                                        
-            category_names.append(data)
+        
+        for category in Articulo.objects.all().order_by('talla'):
+                    xinvini=0
+                    xingresos=0
+                    xsalidas=0
+                    xsaldo = 0
+                    datail = []
+                    for estado in Mcotizacion.objects.all():
+                            nestado = estado.estado
+                            pkmaster = estado.id
+                            choices = {1: 'Inventario Inicial', 2: 'Ingreso Producto',3: 'Salida Producto',4: 'Anulado'}
+                            seltipo = choices.get(nestado, 'default')
+                            detail_cotizacion = Dcotizacion.objects.filter(codpro=category.codigo,master=pkmaster).aggregate(Sum('cantidad'))
 
+                            valor_cantidad = detail_cotizacion['cantidad__sum'] if  type(detail_cotizacion['cantidad__sum'])   != type(None) else 0 
+                            
+                            invini  = valor_cantidad if nestado==1 else 0
+                            ingresos= valor_cantidad if nestado==2 else 0 
+                            salidas = valor_cantidad if nestado==3 else 0
+                            
+                            xinvini   += invini     
+                            xingresos += ingresos 
+                            xsalidas  += salidas
+                            
+                            for det in Dcotizacion.objects.filter(codpro=category.codigo,master=pkmaster):
+                                datodet = {
+                                        "id": 7,
+                                        "codigo": det.codigo,
+                                        "descripcion":seltipo,
+                                        "cantidad":det.cantidad,
+                                        "precio":det.precio,
+                                        "imptotal":det.imptotal,
+                                        }
+                                datail.append(datodet)
+                    xsaldo    = (xinvini+xingresos)-xsalidas
+                    #print (category.codigo,valor_cantidad,nestado,xinvini,xingresos,xsalidas)
+                    data = {'codigo': category.codigo,
+                            'descripcion': category.descripcion,
+                            'inv.inicial':   xinvini,
+                            'ingresos':  xingresos ,
+                            'salidas':   xsalidas ,
+                            'saldo.actual':     xsaldo,
+                            "cotizaciones": [datail]}
+
+                    category_names.append(data)
         return Response(category_names)
 
 class listaarticuloViewSet(viewsets.ModelViewSet):
@@ -515,7 +547,7 @@ def export_users_xls(request):
     # Sheet body, remaining rows
     font_style = xlwt.XFStyle()
 
-    rows = Material.objects.all().values_list('codigo', 'descripcion', 'color', 'unimed')
+    rows = Material.objects.all().values_list('codigo', 'descripcion', 'descolor', 'unimed')
     for row in rows:
         row_num += 1
         for col_num in range(len(row)):
