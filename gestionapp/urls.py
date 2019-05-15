@@ -10,9 +10,17 @@ router = DefaultRouter()
 router.register(r'mcotizacion', views.CotizacionViewSet)
 router.register(r'mmateriales', views.MaterialesViewSet)
 router.register(r'cotizacion_estado', views.CotizacionEstadoViewSet)
+
+#Productos
 router.register(r'lista_stock', views.StockViewSet, base_name='put-something-here', )
 router.register(r'lista_articulos', views.listaarticuloViewSet, base_name='put-something-here', )
 router.register(r'lista_articulos_detalle', views.lista_articulos_detalleViewSet, base_name='put-something-here', )
+
+#Materiales
+router.register(r'lista_stock_mat', views.Stock_matViewSet, base_name='put-something-here', )
+router.register(r'lista_materiales', views.listamaterialViewSet, base_name='put-something-here', )
+router.register(r'lista_materiales_detalle', views.lista_materiales_detalleViewSet, base_name='put-something-here', )
+
 
 urlpatterns = [
     url(r'^deposito$', views.DepositoList.as_view()),
@@ -51,5 +59,6 @@ urlpatterns = [
     url(r'^generatemat_pdf/(?P<pk>\d+)/$', views.GeneratePDFMaterialesDetail.as_view()),
     url(r'^generate_html$', TemplateView.as_view(template_name="gestionapp/invoice.html")),
     url(r'^export_xls$', views.export_users_xls, name='materiales'),
+    url(r'^export_xls_arti$', views.export_xls_arti, name='productos'),
     url(r'^xls_stock$', views.export_xls_stock, name='materiales'),
 ]

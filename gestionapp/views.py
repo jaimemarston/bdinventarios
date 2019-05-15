@@ -476,7 +476,68 @@ class lista_articulos_detalleViewSet(viewsets.ModelViewSet):
                             'ingresos':  xingresos ,
                             'salidas':   xsalidas ,
                             'saldo.actual':     xsaldo,
-                            "cotizaciones": [datail]}
+                            "cotizaciones": datail}
+
+                    category_names.append(data)
+        return Response(category_names)
+
+class lista_materiales_detalleViewSet(viewsets.ModelViewSet):
+    # queryset = Blogpost.objects.all().order_by('date')
+    serializer_class = MaterialSerializer
+
+    def get_queryset(self):
+        # Chances are, you're doing something more advanced here 
+        # like filtering.
+        Material.objects.all()
+
+    # https://www.peterbe.com/plog/efficient-m2m-django-rest-framework
+    def list(self, request, *args, **kwargs):
+        # response = super().list(request, *args, **kwargs)
+        # qs = self.get_queryset()
+        category_names = []
+        
+        for category in Material.objects.all():
+                    xinvini=0
+                    xingresos=0
+                    xsalidas=0
+                    xsaldo = 0
+                    datail = []
+                    for estado in Mmateriales.objects.all():
+                            nestado = estado.estado
+                            pkmaster = estado.id
+                            choices = {1: 'Inventario Inicial', 2: 'Ingreso Producto',3: 'Salida Producto',4: 'Anulado'}
+                            seltipo = choices.get(nestado, 'default')
+                            detail_material = Dmateriales.objects.filter(codpro=category.codigo,master=pkmaster).aggregate(Sum('cantidad'))
+
+                            valor_cantidad = detail_material['cantidad__sum'] if  type(detail_material['cantidad__sum'])   != type(None) else 0 
+                            
+                            invini  = valor_cantidad if nestado==1 else 0
+                            ingresos= valor_cantidad if nestado==2 else 0 
+                            salidas = valor_cantidad if nestado==3 else 0
+                            
+                            xinvini   += invini     
+                            xingresos += ingresos 
+                            xsalidas  += salidas
+                            
+                            for det in Dmateriales.objects.filter(codpro=category.codigo,master=pkmaster):
+                                datodet = {
+                                        "id": 7,
+                                        "codigo": det.codigo,
+                                        "descripcion":seltipo,
+                                        "cantidad":det.cantidad,
+                                        "precio":det.precio,
+                                        "imptotal":det.imptotal,
+                                        }
+                                datail.append(datodet)
+                    xsaldo    = (xinvini+xingresos)-xsalidas
+                    #print (category.codigo,valor_cantidad,nestado,xinvini,xingresos,xsalidas)
+                    data = {'codigo': category.codigo,
+                            'descripcion': category.descripcion,
+                            'inv.inicial':   xinvini,
+                            'ingresos':  xingresos ,
+                            'salidas':   xsalidas ,
+                            'saldo.actual':     xsaldo,
+                            "cotizaciones": datail}
 
                     category_names.append(data)
         return Response(category_names)
@@ -497,13 +558,37 @@ class listaarticuloViewSet(viewsets.ModelViewSet):
 
         category_names = []
         for category in Articulo.objects.all():
-            data = {'codigo': category.id,
+            data = {'codigo': category.codigo,
                     'description': category.descripcion}
             category_names.append(data)
 
         return Response(category_names)
 
         # return response
+class listamaterialViewSet(viewsets.ModelViewSet):
+    # queryset = Blogpost.objects.all().order_by('date')
+    serializer_class = MaterialSerializer
+
+    def get_queryset(self):
+        # Chances are, you're doing something more advanced here 
+        # like filtering.
+        Material.objects.all()
+
+    # https://www.peterbe.com/plog/efficient-m2m-django-rest-framework
+    def list(self, request, *args, **kwargs):
+        # response = super().list(request, *args, **kwargs)
+        # qs = self.get_queryset()
+
+        category_names = []
+        for category in Material.objects.all():
+            data = {'codigo': category.codigo,
+                    'description': category.descripcion}
+            category_names.append(data)
+
+        return Response(category_names)
+
+        # return response
+
 class StockViewSet(viewsets.ModelViewSet):
     # queryset = Blogpost.objects.all().order_by('date')
     serializer_class = ArticuloSerializer
@@ -519,10 +604,62 @@ class StockViewSet(viewsets.ModelViewSet):
         # qs = self.get_queryset()
         #choices = {1: 'Inventario Inicial', 2: 'Ingreso Producto',3: 'Salida Producto',4: 'Anulado'}
 
-        category_names=lista_stock()
+        category_names=lista_stock_mat()
         return Response(category_names)
 
         # return response
+
+class Stock_matViewSet(viewsets.ModelViewSet):
+    # queryset = Blogpost.objects.all().order_by('date')
+    serializer_class = MaterialSerializer
+
+    def get_queryset(self):
+        # Chances are, you're doing something more advanced here 
+        # like filtering.
+        Material.objects.all()
+
+    # https://www.peterbe.com/plog/efficient-m2m-django-rest-framework
+    def list(self, request, *args, **kwargs):
+        # response = super().list(request, *args, **kwargs)
+        # qs = self.get_queryset()
+        #choices = {1: 'Inventario Inicial', 2: 'Ingreso Producto',3: 'Salida Producto',4: 'Anulado'}
+
+        category_names=lista_stock_mat()
+        return Response(category_names)
+
+        # return response
+
+
+def export_xls_arti(request):
+    nreport = 'productos'
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename=' + nreport + '.xls'
+
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet(nreport)
+
+    # Sheet header, first row
+    row_num = 0
+
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+
+    columns = ['CODIGO', 'DESCRIPCION', 'COLOR', 'TIPO','TALLA', 'UM', 'PRECIOVENTA' ]
+
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+
+    # Sheet body, remaining rows
+    font_style = xlwt.XFStyle()
+
+    rows = Articulo.objects.all().values_list('codigo', 'descripcion', 'descolor', 'tipo','talla', 'unimed','precioventa')
+    for row in rows:
+        row_num += 1
+        for col_num in range(len(row)):
+            ws.write(row_num, col_num, row[col_num], font_style)
+
+    wb.save(response)
+    return response
 
 
 def export_users_xls(request):
@@ -539,7 +676,7 @@ def export_users_xls(request):
     font_style = xlwt.XFStyle()
     font_style.font.bold = True
 
-    columns = ['CODIGO', 'DESCRIPCION', 'COLOR', 'UM', ]
+    columns = ['CODIGO', 'DESCRIPCION', 'COLOR', 'TIPO', 'UM', 'PRECIOVENTA' ]
 
     for col_num in range(len(columns)):
         ws.write(row_num, col_num, columns[col_num], font_style)
@@ -547,7 +684,7 @@ def export_users_xls(request):
     # Sheet body, remaining rows
     font_style = xlwt.XFStyle()
 
-    rows = Material.objects.all().values_list('codigo', 'descripcion', 'descolor', 'unimed')
+    rows = Material.objects.all().values_list('codigo', 'descripcion', 'descolor', 'tipo', 'unimed','precioventa')
     for row in rows:
         row_num += 1
         for col_num in range(len(row)):
@@ -617,6 +754,44 @@ def lista_stock():
                     detail_cotizacion = Dcotizacion.objects.filter(codpro=category.codigo,master=pkmaster).aggregate(Sum('cantidad'))
 
                     valor_cantidad = detail_cotizacion['cantidad__sum'] if  type(detail_cotizacion['cantidad__sum'])   != type(None) else 0 
+                    
+                    invini  = valor_cantidad if nestado==1 else 0
+                    ingresos= valor_cantidad if nestado==2 else 0 
+                    salidas = valor_cantidad if nestado==3 else 0
+                    
+                    xinvini   += invini     
+                    xingresos += ingresos 
+                    xsalidas  += salidas                    
+            xsaldo    = (xinvini+xingresos)-xsalidas
+            #print (category.codigo,valor_cantidad,nestado,xinvini,xingresos,xsalidas)
+            data = {'codigo': category.codigo,
+                    'descripcion': category.descripcion,
+                    'inv.inicial':   xinvini,
+                    'ingresos':  xingresos ,
+                    'salidas':   xsalidas ,
+                    'saldo.actual':     xsaldo,
+                            }
+
+            category_names.append(data)
+    
+    return category_names
+
+def lista_stock_mat():
+    category_names = []
+
+    
+    for category in Material.objects.all():
+            xinvini=0
+            xingresos=0
+            xsalidas=0
+            xsaldo = 0
+            for estado in Mmateriales.objects.all():
+                    nestado = estado.estado
+                    pkmaster = estado.id
+
+                    detail_material = Dmateriales.objects.filter(codpro=category.codigo,master=pkmaster).aggregate(Sum('cantidad'))
+
+                    valor_cantidad = detail_material['cantidad__sum'] if  type(detail_material['cantidad__sum'])   != type(None) else 0 
                     
                     invini  = valor_cantidad if nestado==1 else 0
                     ingresos= valor_cantidad if nestado==2 else 0 
