@@ -527,7 +527,14 @@ class listaarticuloViewSet(viewsets.ModelViewSet):
         category_names = []
         for category in Articulo.objects.all():
             data = {'codigo': category.codigo,
-                    'description': category.descripcion}
+                    'description': category.descripcion,
+                    'tipo': category.tipo,
+                    'genero': category.genero,
+                    'modelo': category.modelo,
+                    'talla': category.talla,
+                    'descolor': category.descolor,
+                    'desunimed': category.unimed,
+                    'precio': category.precioventa}
             category_names.append(data)
 
         return Response(category_names)
@@ -572,7 +579,7 @@ class StockViewSet(viewsets.ModelViewSet):
         # qs = self.get_queryset()
         #choices = {1: 'Inventario Inicial', 2: 'Ingreso Producto',3: 'Salida Producto',4: 'Anulado'}
 
-        category_names=lista_stock_mat()
+        category_names=lista_stock()
         return Response(category_names)
 
         # return response
@@ -661,6 +668,50 @@ def export_users_xls(request):
     wb.save(response)
     return response
 
+# DETALLE DE MATERIALES A EXCEL
+def export_xls_matdetalle(request): 
+    nreport = 'Detalle_Materiales'
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename=' + nreport + '.xls'
+   
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet(nreport)
+    # Sheet header, first row
+    row_num = 0
+
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+
+        # Sheet body, remaining rows
+    font_style = xlwt.XFStyle()
+
+    category_names=materiales_detalle()
+
+    columns = ['CODIGO', 'DESCRIPCION', 'INVINICIAL', 'INGRESOS', 'SALIDAS','SALDOACTUAL' ]
+
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+
+    # add_sheet is used to create sheet. 
+    for row in category_names:
+        row_num += 1
+        #print(row_num,col_num,row[col_num],font_style)
+        ws.write(row_num,0,row['codigo'],font_style)
+        ws.write(row_num,1,row['descripcion'],font_style)
+        ws.write(row_num,2,row['inv.inicial'],font_style)
+        ws.write(row_num,3,row['ingresos'],font_style)
+        ws.write(row_num,4,row['salidas'],font_style)
+        ws.write(row_num,5,row['saldo.actual'],font_style)
+        for detalle in row['materiales']:
+            row_num += 1
+            ws.write(row_num,0,detalle['codigo'],font_style)
+            ws.write(row_num,1,detalle['descripcion'],font_style)
+            ws.write(row_num,3,detalle['precio'],font_style)
+            ws.write(row_num,4,detalle['imptotal'],font_style)
+            ws.write(row_num,5,detalle['cantidad'],font_style)
+    wb.save(response)
+    return response
+
 
 # DETALLE DE PRODUCTOS A EXCEL
 def export_xls_proddetalle(request): 
@@ -708,7 +759,7 @@ def export_xls_proddetalle(request):
     wb.save(response)
     return response
 
-def export_xls_stock(request): 
+def export_xls_stock_mat(request): 
     nreport = 'stock_materiales'
     response = HttpResponse(content_type='application/ms-excel')
     response['Content-Disposition'] = 'attachment; filename=' + nreport + '.xls'
@@ -751,11 +802,53 @@ def export_xls_stock(request):
     wb.save(response)
     return response
 
+def export_xls_stock(request): 
+    nreport = 'stock_productos'
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename=' + nreport + '.xls'
+   
+   # Workbook is created 
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet(nreport)
+
+    # Sheet header, first row
+    row_num = 0
+
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+
+        # Sheet body, remaining rows
+    font_style = xlwt.XFStyle()
+
+    category_names=lista_stock()
+
+    columns = ['CODIGO', 'DESCRIPCION', 'INVINICIAL', 'INGRESOS', 'SALIDAS','SALDOACTUAL' ]
+
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+
+    # add_sheet is used to create sheet. 
+    for row in category_names:
+        row_num += 1
+        #print(row_num,col_num,row[col_num],font_style)
+        ws.write(row_num,0,row['codigo'],font_style)
+        ws.write(row_num,1,row['descripcion'],font_style)
+        ws.write(row_num,2,row['inv.inicial'],font_style)
+        ws.write(row_num,3,row['ingresos'],font_style)
+        ws.write(row_num,4,row['salidas'],font_style)
+        ws.write(row_num,5,row['saldo.actual'],font_style)
+            
+            #ws.write(row_num, col_num, row[col_num], font_style)
     
+    
+    
+    wb.save(response)
+    return response
+
+
 def lista_stock():
     category_names = []
 
-    
     for category in Articulo.objects.all().order_by('talla'):
             xinvini=0
             xingresos=0
@@ -780,7 +873,13 @@ def lista_stock():
             #print (category.codigo,valor_cantidad,nestado,xinvini,xingresos,xsalidas)
             data = {'codigo': category.codigo,
                     'descripcion': category.descripcion,
-                    'inv.inicial':   xinvini,
+                    'tipo': category.tipo,
+                    'genero': category.genero,
+                    'modelo': category.modelo,
+                    'talla': category.talla,
+                    'descolor': category.descolor,
+                    'desunimed': category.unimed,
+                    'inv.inicial': xinvini,
                     'ingresos':  xingresos ,
                     'salidas':   xsalidas ,
                     'saldo.actual':     xsaldo,
@@ -875,6 +974,57 @@ def articulos_detalle():
                         'salidas':   xsalidas ,
                         'saldo.actual':     xsaldo,
                         "cotizaciones": datail}
+
+                category_names.append(data)
+
+    return category_names
+
+def materiales_detalle():
+    category_names = []
+        
+    for category in Material.objects.all():
+                xinvini=0
+                xingresos=0
+                xsalidas=0
+                xsaldo = 0
+                datail = []
+                for estado in Mmateriales.objects.all():
+                        nestado = estado.estado
+                        pkmaster = estado.id
+                        choices = {1: 'Inventario Inicial', 2: 'Ingreso Producto',3: 'Salida Producto',4: 'Anulado'}
+                        seltipo = choices.get(nestado, 'default')
+                        detail_material = Dmateriales.objects.filter(codpro=category.codigo,master=pkmaster).aggregate(Sum('cantidad'))
+
+                        valor_cantidad = detail_material['cantidad__sum'] if  type(detail_material['cantidad__sum'])   != type(None) else 0 
+                        
+                        invini  = valor_cantidad if nestado==1 else 0
+                        ingresos= valor_cantidad if nestado==2 else 0 
+                        salidas = valor_cantidad if nestado==3 else 0
+                        
+                        xinvini   += invini     
+                        xingresos += ingresos 
+                        xsalidas  += salidas
+                        
+                        for det in Dmateriales.objects.filter(codpro=category.codigo,master=pkmaster):
+                            datodet = {
+                                    "id": 7,
+                                    "codigo": det.codigo,
+                                    "descripcion":seltipo,
+                                    "cantidad":det.cantidad,
+                                    "precio":det.precio,
+                                    "imptotal":det.imptotal,
+                                    }
+                            datail.append(datodet)
+                xsaldo    = (xinvini+xingresos)-xsalidas
+                #print (category.codigo,valor_cantidad,nestado,xinvini,xingresos,xsalidas)
+                data = {'codigo': category.codigo,
+                        'descripcion': category.descripcion,
+                        'unimed': category.unimed,
+                        'inv.inicial':   xinvini,
+                        'ingresos':  xingresos ,
+                        'salidas':   xsalidas ,
+                        'saldo.actual':     xsaldo,
+                        "materiales": datail}
 
                 category_names.append(data)
 

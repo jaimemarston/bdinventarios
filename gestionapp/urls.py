@@ -65,12 +65,24 @@ urlpatterns = [
     url(r'^filtro/(?P<sk>[\w\-\.]+)/(?P<ek>[\w\-\.]+)/$', views.ListViewParam.as_view()),
     #url(r'^filtro/(?P<pk>[\w\-\.]+)/(?P<sk>[\w\-\.]+)/(?P<ek>[\w\-\.]+)/$', views.ListViewParam.as_view()),
     #url(r'^filtro$', views.ListViewParam.as_view()),
-
-
     url(r'^generate_html$', TemplateView.as_view(template_name="gestionapp/invoice.html")),
+    
+    #1 Lista productos
+    url(r'^xls_lista$', views.export_xls_arti, name='productos'),
+    #1.3 Kerdex Resumen
+    url(r'^xls_stock$', views.export_xls_stock, name='productos'),
+    #1.4 Kerdex Detalle
+    url(r'^xls_proddetalle$', views.export_xls_proddetalle, name='productos'),
+    
+
+    #2. Lista Materiales 
     url(r'^export_xls$', views.export_users_xls, name='materiales'),
-    url(r'^export_xls_arti$', views.export_xls_arti, name='productos'),
-    url(r'^xls_stock$', views.export_xls_stock, name='materiales'),
-    url(r'^xls_proddetalle$', views.export_xls_proddetalle, name='materiales'),
+    #2.3 Kerdex Resumen
+    url(r'^xls_stock_mat$', views.export_xls_stock_mat, name='materiales'),
+    #2.4 Kerdex Detalle
+     url(r'^xls_matdetalle$', views.export_xls_matdetalle, name='materiales'),
    
+  
+    
+
 ]
