@@ -21,6 +21,8 @@ router.register(r'lista_stock_mat', views.Stock_matViewSet, base_name='put-somet
 router.register(r'lista_materiales', views.listamaterialViewSet, base_name='put-something-here', )
 router.register(r'lista_materiales_detalle', views.lista_materiales_detalleViewSet, base_name='put-something-here', )
 
+     
+
 
 urlpatterns = [
     url(r'^deposito$', views.DepositoList.as_view()),
@@ -57,8 +59,18 @@ urlpatterns = [
     url(r'^generate_pdf$', views.GeneratePDFCotizacionesDetail.as_view()),
     url(r'^generate_pdf/(?P<pk>\d+)/$', views.GeneratePDFCotizacionesDetail.as_view()),
     url(r'^generatemat_pdf/(?P<pk>\d+)/$', views.GeneratePDFMaterialesDetail.as_view()),
+
+    
+    #http://localhost:8080/filtro/2019-05-13/2019-05-13/
+    url(r'^filtro/(?P<sk>[\w\-\.]+)/(?P<ek>[\w\-\.]+)/$', views.ListViewParam.as_view()),
+    #url(r'^filtro/(?P<pk>[\w\-\.]+)/(?P<sk>[\w\-\.]+)/(?P<ek>[\w\-\.]+)/$', views.ListViewParam.as_view()),
+    #url(r'^filtro$', views.ListViewParam.as_view()),
+
+
     url(r'^generate_html$', TemplateView.as_view(template_name="gestionapp/invoice.html")),
     url(r'^export_xls$', views.export_users_xls, name='materiales'),
     url(r'^export_xls_arti$', views.export_xls_arti, name='productos'),
     url(r'^xls_stock$', views.export_xls_stock, name='materiales'),
+    url(r'^xls_proddetalle$', views.export_xls_proddetalle, name='materiales'),
+   
 ]
