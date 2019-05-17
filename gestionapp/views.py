@@ -904,7 +904,7 @@ def export_xls_stock(request):
 
     category_names=lista_stock()
 
-    columns = ['CODIGO', 'DESCRIPCION','TIPO','GENERO','MODELO','DESCOLOR','DESUNIMED', 'INVINICIAL', 'INGRESOS', 'SALIDAS','SALDOACTUAL' ]
+    columns = ['CODIGO', 'DESCRIPCION','TIPO','GENERO','MODELO','TALLA','DESCOLOR','DESUNIMED', 'INVINICIAL', 'INGRESOS', 'SALIDAS','SALDOACTUAL' ]
 
     for col_num in range(len(columns)):
         ws.write(row_num, col_num, columns[col_num], font_style)
