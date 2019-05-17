@@ -272,8 +272,16 @@ class GeneratePDFCotizacionesDetail(PDFTemplateView):
             
             queryset1 = Dcotizacion.objects.filter(master=pk).values().order_by('talla')
             nestado = list(Mcotizacion.objects.filter(id=pk).values_list('estado')[0])[0]
-            resumen = Dcotizacion.objects.filter(master=pk).values('genero').annotate(Sum('cantidad'),Sum('imptotal'))
-            
+            resumenl = Dcotizacion.objects.filter(master=pk).values('genero').annotate(Sum('cantidad'),Sum('imptotal'))
+            resumen = []
+            for det in resumenl:
+                
+                data = {'genero': det['genero'],
+                       'cantidad__sum':det['cantidad__sum'], 
+                       'imptotal__sum':det['imptotal__sum']}
+
+                resumen.append(data)
+
             choices = {1: 'Inventario Inicial', 2: 'Ingreso Producto',3: 'Salida Producto',4: 'Anulado'}
             seltipo = choices.get(nestado, 'default')
             
