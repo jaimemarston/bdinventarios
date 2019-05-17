@@ -311,7 +311,7 @@ class GeneratePDFCotizacionesDetail(PDFTemplateView):
             fields_db=fields_db,
             fields_res=fields_res,
             tipo_movimiento=seltipo,
-            resultado_total=round(detail_total['imptotal__sum'],2),
+            resultado_total=("%.2f" % round(detail_total['imptotal__sum'],2)),
             resultado_cantidad=detail_total['cantidad__sum'],
             muestra_imagenes1=imagen_obt1,
             muestra_imagenes2=imagen_obt2,
@@ -375,7 +375,7 @@ class GeneratePDFMaterialesDetail(PDFTemplateView):
 
         return super(GeneratePDFMaterialesDetail, self).get_context_data(
             pagesize='A4',
-            title='Control de Productos',
+            title='Control de Materiales',
             today=now(),
             cotizacion=queryset,
             headerset=headerset,
