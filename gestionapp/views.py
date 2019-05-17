@@ -277,8 +277,8 @@ class GeneratePDFCotizacionesDetail(PDFTemplateView):
             for det in resumenl:
                 
                 data = {'genero': det['genero'],
-                       'cantidad__sum':det['cantidad__sum'], 
-                       'imptotal__sum':det['imptotal__sum']}
+                       'cantidad__sum':("%.2f" % round(det['cantidad__sum'],2)),
+                       'imptotal__sum':("%.2f" % round(det['imptotal__sum'],2))}
 
                 resumen.append(data)
 
