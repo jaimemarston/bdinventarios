@@ -311,7 +311,7 @@ class GeneratePDFCotizacionesDetail(PDFTemplateView):
             fields_db=fields_db,
             fields_res=fields_res,
             tipo_movimiento=seltipo,
-            resultado_total=detail_total['imptotal__sum'],
+            resultado_total=round(detail_total['imptotal__sum'],2),
             resultado_cantidad=detail_total['cantidad__sum'],
             muestra_imagenes1=imagen_obt1,
             muestra_imagenes2=imagen_obt2,
