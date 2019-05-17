@@ -27,10 +27,13 @@ if 1==2:
     Statement += "desunimed  = (select gestionapp_articulo.unimed       from gestionapp_articulo where gestionapp_articulo.codigo = gestionapp_dcotizacion.codpro),"
     Statement += "talla   = (select gestionapp_articulo.talla        from gestionapp_articulo where gestionapp_articulo.codigo = gestionapp_dcotizacion.codpro),"
     Statement += "tipo    = (select gestionapp_articulo.tipo         from gestionapp_articulo where gestionapp_articulo.codigo = gestionapp_dcotizacion.codpro)"
+
+if 1==1:
+    Statement = "update gestionapp_dcotizacion set genero  = (select gestionapp_articulo.genero   from gestionapp_articulo where gestionapp_articulo.codigo = gestionapp_dcotizacion.codpro)"
 #print (Statement)
 
 #Statement = "update gestionapp_dcotizacion set imptotal = precio * cantidad "
-Statement = "update gestionapp_dmateriales set imptotal = precio * cantidad "
+#Statement = "update gestionapp_dmateriales set imptotal = precio * cantidad "
 
 cursor.execute(Statement)
 con.commit()
