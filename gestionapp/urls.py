@@ -21,6 +21,9 @@ router.register(r'lista_stock_mat', views.Stock_matViewSet, base_name='put-somet
 router.register(r'lista_materiales', views.listamaterialViewSet, base_name='put-something-here', )
 router.register(r'lista_materiales_detalle', views.lista_materiales_detalleViewSet, base_name='put-something-here', )
 
+router.register(r'control_pagos', views.control_pagosViewSet, base_name='put-something-here', )
+
+
      
 
 
@@ -69,9 +72,9 @@ urlpatterns = [
     
     #1 Lista productos
     url(r'^xls_lista$', views.export_xls_arti, name='productos'),
-    #1.3 Kerdex Resumen
+    #1.3 Kerdex DETALLE
     url(r'^xls_stock$', views.export_xls_stock, name='productos'),
-    #1.4 Kerdex Detalle
+    #1.4 Kerdex RESUMEN
     url(r'^xls_proddetalle$', views.export_xls_proddetalle, name='productos'),
     
 
