@@ -859,7 +859,7 @@ def export_xls_stock_mat(request):
         # Sheet body, remaining rows
     font_style = xlwt.XFStyle()
 
-    category_names=lista_stock()
+    category_names=lista_stock_mat()
 
     columns = ['CODIGO', 'DESCRIPCION', 'INVINICIAL', 'INGRESOS', 'SALIDAS','SALDOACTUAL' ]
 

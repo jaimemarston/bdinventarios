@@ -33,9 +33,9 @@ class Camposcomunes_masterdoc(models.Model):
     desconpag = models.CharField(max_length=50, null=True, blank=True)
     monedapago = models.IntegerField(default=0)  # soles,dolares,euros,yen
     desmonepago = models.CharField(max_length=50, null=True, blank=True)
-    tc_dolares = models.IntegerField(default=0)
-    tc_euros = models.IntegerField(default=0)
-    tc_yen = models.IntegerField(default=0)
+    tc_dolares = models.DecimalField(default=0, max_digits=8, decimal_places=3, null=True, blank=True)
+    tc_euros = models.DecimalField(default=0, max_digits=8, decimal_places=3, null=True, blank=True)
+    tc_yen = models.DecimalField(default=0, max_digits=8, decimal_places=3, null=True, blank=True)
     numeroguia = models.IntegerField(default=0)
     numordserv = models.IntegerField(default=0)
     vendidopor = models.CharField(max_length=30, null=True, blank=True)
