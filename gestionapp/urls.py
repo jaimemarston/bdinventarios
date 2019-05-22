@@ -71,10 +71,10 @@ urlpatterns = [
     url(r'^generate_html$', TemplateView.as_view(template_name="gestionapp/invoice.html")),
     
     #1 Lista productos
-    url(r'^xls_lista$', views.export_xls_arti, name='productos'),
-    #1.3 Kerdex DETALLE
+    url(r'^export_xls_arti$', views.export_xls_arti, name='productos'),
+    #1.3 Kardex DETALLE
     url(r'^xls_stock$', views.export_xls_stock, name='productos'),
-    #1.4 Kerdex RESUMEN
+    #1.4 Kardex RESUMEN
     url(r'^xls_proddetalle$', views.export_xls_proddetalle, name='productos'),
     
 
