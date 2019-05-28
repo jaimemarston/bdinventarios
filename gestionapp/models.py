@@ -224,6 +224,8 @@ class Material(models.Model):
     desunimed = models.CharField(max_length=30, blank=True, null=True)
     umdsali = models.CharField(max_length=30, blank=True, null=True)
     umdsaliconv = models.CharField(max_length=30, blank=True, null=True)
+    monedacompra = models.IntegerField(default=0)  # soles,dolares,euros,yen
+    desmonecompra = models.CharField(max_length=50, null=True, blank=True)
     tipo = models.CharField(max_length=60, blank=True, null=True)
 
 
@@ -254,6 +256,8 @@ class Articulo(models.Model):
     desunimed = models.CharField(max_length=30, blank=True, null=True)
     umdsali = models.CharField(max_length=30, blank=True, null=True)
     umdsaliconv = models.CharField(max_length=30, blank=True, null=True)
+    monedaventa = models.IntegerField(default=0)  # soles,dolares,euros,yen
+    desmoneventa = models.CharField(max_length=50, null=True, blank=True)
     tipo = models.CharField(max_length=60, blank=True, null=True)
 
 

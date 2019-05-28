@@ -1,0 +1,1 @@
+GET http://localhost:8080/lista_articulos/?page=2

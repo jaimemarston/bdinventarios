@@ -21,6 +21,7 @@ router.register(r'lista_stock_mat', views.Stock_matViewSet, base_name='put-somet
 router.register(r'lista_materiales', views.listamaterialViewSet, base_name='put-something-here', )
 router.register(r'lista_materiales_detalle', views.lista_materiales_detalleViewSet, base_name='put-something-here', )
 
+#Proveedores
 router.register(r'control_pagos', views.control_pagosViewSet, base_name='put-something-here', )
 
 
@@ -77,6 +78,9 @@ urlpatterns = [
     #1.4 Kardex RESUMEN
     url(r'^xls_proddetalle$', views.export_xls_proddetalle, name='productos'),
     
+    #1.5 Proveedores
+    
+    url(r'^xls_control_pagos$', views.export_xls_control_pagos, name='proveedores'),
 
     #2. Lista Materiales 
     url(r'^export_xls$', views.export_users_xls, name='materiales'),

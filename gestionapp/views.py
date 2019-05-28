@@ -470,64 +470,9 @@ class control_pagosViewSet(viewsets.ModelViewSet):
         # response = super().list(request, *args, **kwargs)
         # qs = self.get_queryset()
         
-
-        category_names = []
-
-        for category in Proveedor.objects.all():
-                    xinvini=0
-                    xingresos=0
-                    xsalidas=0
-                    xsaldo = 0
-                    nimppagado=0
-                    nimpcobrado=0
-                    datail = []
-                    for estado in Mcotizacion.objects.filter(ruc=category.ruc):
-                            nestado = estado.estado
-                            pkmaster = estado.id
-                            nimppagado = estado.imppagado
-                            choices = {1: 'Inventario Inicial', 2: 'Ingreso Producto',3: 'Salida Producto',4: 'Anulado'}
-                            seltipo = choices.get(nestado, 'default')
-                            detail_material = Dcotizacion.objects.filter(master=pkmaster).aggregate(Sum('cantidad'))
-                            
-                            nimpcobrado_det = Dcotizacion.objects.filter(master=pkmaster).aggregate(Sum('imptotal'))  
-                            nimpcobrado =  nimpcobrado_det['imptotal__sum'] if  type(nimpcobrado_det['imptotal__sum'])   != type(None) else 0 
-                            valor_cantidad = detail_material['cantidad__sum'] if  type(detail_material['cantidad__sum'])   != type(None) else 0 
-                            
-                            invini  = valor_cantidad if nestado==1 else 0
-                            ingresos= valor_cantidad if nestado==2 else 0 
-                            salidas = valor_cantidad if nestado==3 else 0
-                            
-                            xinvini   += invini     
-                            xingresos += ingresos 
-                            xsalidas  += salidas
-                            
-                            for det in Dcotizacion.objects.filter(master=pkmaster):
-                                datodet = {
-                                        "id": 7,
-                                        "codigo": det.codigo,
-                                        "tipo":seltipo,
-                                        "codpro":det.codpro,
-                                        "descripcion":det.descripcion,
-                                        "cantidad":det.cantidad,
-                                        "precio":det.precio,
-                                        "imptotal":det.imptotal,
-                                        }
-                                datail.append(datodet)
-                    xsaldo    = (xinvini+xingresos)-xsalidas
-                    #print (category.codigo,valor_cantidad,nestado,xinvini,xingresos,xsalidas)
-                    data = {'codigo': category.ruc,
-                            'descripcion': category.nombre,
-                            'inv.inicial':   xinvini,
-                            'ingresos':  xingresos ,
-                            'salidas':   xsalidas ,
-                            'saldo.actual':     xsaldo,
-                            'importecobrado' : nimpcobrado,
-                            'importepagado' : nimppagado,
-                            'saldo_importe' : nimppagado-nimpcobrado,
-                            "cotizaciones": datail}
-
-                    category_names.append(data)
+        category_names=control_pagos()
         return Response(category_names)
+
 
 class lista_materiales_detalleViewSet(viewsets.ModelViewSet):
     # queryset = Blogpost.objects.all().order_by('date')
@@ -595,17 +540,21 @@ class lista_materiales_detalleViewSet(viewsets.ModelViewSet):
 class listaarticuloViewSet(viewsets.ModelViewSet):
     # queryset = Blogpost.objects.all().order_by('date')
     serializer_class = ArticuloSerializer
+    paginate_by = 10
+    paginate_by_param = 'page_size'
+    max_paginate_by = 10
 
     def get_queryset(self):
         # Chances are, you're doing something more advanced here 
         # like filtering.
-        Articulo.objects.all()
+        category_names = []
+        #Articulo.objects.all()
 
     # https://www.peterbe.com/plog/efficient-m2m-django-rest-framework
     def list(self, request, *args, **kwargs):
         # response = super().list(request, *args, **kwargs)
         # qs = self.get_queryset()
-
+        
         category_names = []
         for category in Articulo.objects.all():
             data = {'codigo': category.codigo,
@@ -618,7 +567,9 @@ class listaarticuloViewSet(viewsets.ModelViewSet):
                     'desunimed': category.unimed,
                     'precio': category.precioventa}
             category_names.append(data)
-
+        paginate_by = 10
+        paginate_by_param = 'page_size'
+        max_paginate_by = 100
         return Response(category_names)
 
         # return response
@@ -794,6 +745,55 @@ def export_xls_matdetalle(request):
     wb.save(response)
     return response
 
+# DETALLE DE PAGO PROVEEDORES
+
+def export_xls_control_pagos(request): 
+    nreport = 'Detalle_Pago'
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename=' + nreport + '.xls'
+   
+   
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet(nreport)
+
+    # Sheet header, first row
+    row_num = 0
+
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+
+        # Sheet body, remaining rows
+    font_style = xlwt.XFStyle()
+
+    category_names=control_pagos()
+    columns = ['CODIGO', 'DESCRIPCION', 'INVINICIAL', 'INGRESOS', 'SALIDAS','SALDOACTUAL','COBRADO','PAGADO','SALDO' ]
+
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+
+    # add_sheet is used to create sheet. 
+    for row in category_names:
+        row_num += 1
+        #print(row_num,col_num,row[col_num],font_style)
+        ws.write(row_num,0,row['codigo'],font_style)
+        ws.write(row_num,1,row['descripcion'],font_style)
+        ws.write(row_num,2,row['inv.inicial'],font_style)
+        ws.write(row_num,3,row['ingresos'],font_style)
+        ws.write(row_num,4,row['salidas'],font_style)
+        ws.write(row_num,5,row['saldo.actual'],font_style)
+        ws.write(row_num,6,row['importecobrado'],font_style)
+        ws.write(row_num,7,row['importepagado'],font_style)
+        ws.write(row_num,8,row['saldo_importe'],font_style)
+        for detalle in row['cotizaciones']:
+            row_num += 1
+            ws.write(row_num,0,detalle['codigo'],font_style)
+            ws.write(row_num,1,detalle['descripcion'],font_style)
+            ws.write(row_num,2,detalle['precio'],font_style)
+            ws.write(row_num,3,detalle['imptotal'],font_style)
+            ws.write(row_num,4,detalle['cantidad'],font_style)
+    wb.save(response)
+    return response
+
 
 # DETALLE DE PRODUCTOS A EXCEL
 def export_xls_proddetalle(request): 
@@ -835,9 +835,10 @@ def export_xls_proddetalle(request):
             row_num += 1
             ws.write(row_num,0,detalle['codigo'],font_style)
             ws.write(row_num,1,detalle['descripcion'],font_style)
+            ws.write(row_num,2,detalle['cantidad'],font_style)
             ws.write(row_num,3,detalle['precio'],font_style)
             ws.write(row_num,4,detalle['imptotal'],font_style)
-            ws.write(row_num,5,detalle['cantidad'],font_style)
+            
     wb.save(response)
     return response
 
@@ -883,6 +884,8 @@ def export_xls_stock_mat(request):
     
     wb.save(response)
     return response
+
+
 
 def export_xls_stock(request): 
     nreport = 'stock_productos'
@@ -1113,6 +1116,66 @@ def materiales_detalle():
                         'salidas':   xsalidas ,
                         'saldo.actual':     xsaldo,
                         "materiales": datail}
+
+                category_names.append(data)
+
+    return category_names
+
+
+def control_pagos():
+    category_names = []
+    for category in Proveedor.objects.all():
+                xinvini=0
+                xingresos=0
+                xsalidas=0
+                xsaldo = 0
+                nimppagado=0
+                nimpcobrado=0
+                datail = []
+                for estado in Mcotizacion.objects.filter(ruc=category.ruc):
+                        nestado = estado.estado
+                        pkmaster = estado.id
+                        nimppagado = estado.imppagado
+                        choices = {1: 'Inventario Inicial', 2: 'Ingreso Producto',3: 'Salida Producto',4: 'Anulado'}
+                        seltipo = choices.get(nestado, 'default')
+                        detail_material = Dcotizacion.objects.filter(master=pkmaster).aggregate(Sum('cantidad'))
+                        
+                        nimpcobrado_det = Dcotizacion.objects.filter(master=pkmaster).aggregate(Sum('imptotal'))  
+                        nimpcobrado =  nimpcobrado_det['imptotal__sum'] if  type(nimpcobrado_det['imptotal__sum'])   != type(None) else 0 
+                        valor_cantidad = detail_material['cantidad__sum'] if  type(detail_material['cantidad__sum'])   != type(None) else 0 
+                        
+                        invini  = valor_cantidad if nestado==1 else 0
+                        ingresos= valor_cantidad if nestado==2 else 0 
+                        salidas = valor_cantidad if nestado==3 else 0
+                        
+                        xinvini   += invini     
+                        xingresos += ingresos 
+                        xsalidas  += salidas
+                        
+                        for det in Dcotizacion.objects.filter(master=pkmaster):
+                            datodet = {
+                                    "id": 7,
+                                    "codigo": det.codigo,
+                                    "tipo":seltipo,
+                                    "codpro":det.codpro,
+                                    "descripcion":det.descripcion,
+                                    "cantidad":det.cantidad,
+                                    "precio":det.precio,
+                                    "imptotal":det.imptotal,
+                                    }
+                            datail.append(datodet)
+                xsaldo    = (xinvini+xingresos)-xsalidas
+                #print (category.codigo,valor_cantidad,nestado,xinvini,xingresos,xsalidas)
+                data = {'codigo': category.ruc,
+                        'descripcion': category.nombre,
+                        'inv.inicial':   xinvini,
+                        'ingresos':  xingresos ,
+                        'salidas':   xsalidas ,
+                        'saldo.actual':     xsaldo,
+                        'importecobrado' : nimpcobrado,
+                        'importepagado' : nimppagado,
+                        'saldo_importe' : nimppagado-nimpcobrado,
+                        "cotizaciones": datail}
 
                 category_names.append(data)
 
