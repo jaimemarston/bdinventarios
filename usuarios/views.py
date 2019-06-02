@@ -46,8 +46,8 @@ class Authenticate(viewsets.ModelViewSet):
                 try:
                     payload = jwt_payload_handler(user)
                     token = jwt.encode(payload, settings.SECRET_KEY)
-                    # user_logged_in.send(sender=user.__class__,
-                    #                     request=request, user=user)
+                    user_logged_in.send(sender=user.__class__,
+                                        request=request, user=user)
                     return Response({'token': token, 'user': AuthenticationUserSerializer(user).data},
                                     status=status.HTTP_200_OK)
 
