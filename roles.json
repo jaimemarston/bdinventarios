@@ -1,0 +1,26 @@
+[
+{
+    "model": "usuarios.roles",
+    "pk": 1,
+    "fields": {
+        "name": "Administrador",
+        "active": true
+    }
+},
+{
+    "model": "usuarios.roles",
+    "pk": 2,
+    "fields": {
+        "name": "Operario Productos",
+        "active": true
+    }
+},
+{
+    "model": "usuarios.roles",
+    "pk": 3,
+    "fields": {
+        "name": "Operario Material",
+        "active": true
+    }
+}
+]
