@@ -15,14 +15,19 @@ from gestionapp.models import (
 from gestionapp.views import lista_stock
 from gestionapp.views import procdic_detailprod
 from gestionapp.views import articulos_detalle
+from gestionapp.views import procdic_sumdetailprod
 
 import time
 
 t0 = time.time()
-#lista=lista_stock()
-lista=articulos_detalle()
+lista=lista_stock()
+#lista=articulos_detalle()
+
+#lista=procdic_detailprod('Articulo')
+#print(lista['19TCV-091'][0])
+#lista=procdic_sumdetailprod('Articulo')
 t1 = time.time()
 total = t1-t0
 
-#lista=procdic_detailprod()
 print ('Tiempo:',total)
+#print (lista)

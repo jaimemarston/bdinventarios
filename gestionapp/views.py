@@ -941,7 +941,7 @@ def export_xls_stock(request):
 
 def lista_stock():
     category_names = []
-    dic_detailprod = procdic_detailprod()
+    dic_sumdetailprod = procdic_sumdetailprod('Articulo')
     
     for category in Articulo.objects.all().order_by('talla'):
             xinvini=0
@@ -957,8 +957,8 @@ def lista_stock():
                     
                     valor_cantidad=0
                    
-                    if pkmaster in dic_detailprod:
-                        valor_cantidad = sum(dic_detailprod[pkmaster][1]) if  type(dic_detailprod[pkmaster][1])   != type(None) else 0 
+                    if pkmaster in dic_sumdetailprod:
+                        valor_cantidad = sum(dic_sumdetailprod[pkmaster][1]) if  type(dic_sumdetailprod[pkmaster][1])   != type(None) else 0 
                     
                     invini  = valor_cantidad if nestado==1 else 0
                     ingresos= valor_cantidad if nestado==2 else 0 
@@ -1027,7 +1027,9 @@ def lista_stock_mat():
 
 def articulos_detalle():
     category_names = []
-    dic_detailprod = procdic_detailprod()    
+    dic_sumdetailprod = procdic_sumdetailprod('Articulo') 
+    dic_detailprod = procdic_detailprod('Articulo')
+    
     for category in Articulo.objects.all().order_by('talla'):
                 xinvini=0
                 xingresos=0
@@ -1044,9 +1046,9 @@ def articulos_detalle():
                         #valor_cantidad = detail_cotizacion['cantidad__sum'] if  type(detail_cotizacion['cantidad__sum'])   != type(None) else 0
                     
                         valor_cantidad=0
-                   
-                        if pkmaster in dic_detailprod:
-                            valor_cantidad = sum(dic_detailprod[pkmaster][1]) if  type(dic_detailprod[pkmaster][1])   != type(None) else 0 
+                        
+                        if pkmaster in dic_sumdetailprod:
+                            valor_cantidad = sum(dic_sumdetailprod[pkmaster][1]) if  type(dic_sumdetailprod[pkmaster][1])   != type(None) else 0 
 
                         #detail_cotizacion = Dcotizacion.objects.filter(codpro=category.codigo,master=pkmaster).aggregate(Sum('cantidad'))
 
@@ -1059,17 +1061,28 @@ def articulos_detalle():
                         xinvini   += invini     
                         xingresos += ingresos 
                         xsalidas  += salidas
+                        if pkmaster in dic_detailprod:                      
+                                datodet = {
+                                        "id": 7,
+                                        "codigo": dic_detailprod[pkmaster][0],
+                                        "descripcion":seltipo,
+                                        "cantidad":dic_detailprod[pkmaster][3],
+                                        "precio":dic_detailprod[pkmaster][4],
+                                        "imptotal":dic_detailprod[pkmaster][5],
+                                        }
+                                datail.append(datodet)
+                        #for det in Dcotizacion.objects.filter(codpro=category.codigo,master=estado.id):
+                        #    datodet = {
+                        #            "id": 7,
+                        #            "codigo": det.codigo,
+                        #            "descripcion":seltipo,
+                        #            "cantidad":det.cantidad,
+                        #            "precio":det.precio,
+                        #            "imptotal":det.imptotal,
+                        #            }
+                        #    datail.append(datodet)
+
                         
-                        for det in Dcotizacion.objects.filter(codpro=category.codigo,master=estado.id):
-                            datodet = {
-                                    "id": 7,
-                                    "codigo": det.codigo,
-                                    "descripcion":seltipo,
-                                    "cantidad":det.cantidad,
-                                    "precio":det.precio,
-                                    "imptotal":det.imptotal,
-                                    }
-                            datail.append(datodet)
                 xsaldo    = (xinvini+xingresos)-xsalidas
                 #print (category.codigo,valor_cantidad,nestado,xinvini,xingresos,xsalidas)
                 data = {'codigo': category.codigo,
@@ -1122,6 +1135,7 @@ def materiales_detalle():
                                     "imptotal":det.imptotal,
                                     }
                             datail.append(datodet)
+                            
                 xsaldo    = (xinvini+xingresos)-xsalidas
                 #print (category.codigo,valor_cantidad,nestado,xinvini,xingresos,xsalidas)
                 data = {'codigo': category.codigo,
@@ -1207,17 +1221,18 @@ def procdic_masterprod():
     return dic_masterprod
     #print(dic_detailprod)
 
-def procdic_detailprod():
-    dic_detailprod = {}
-    #mycode='for category in Articulos.objects.all():'
-    #exec(mycode)
-    for category in Articulo.objects.all():
-    
+def procdic_sumdetailprod(tname):
+    dic_sumdetailprod = {}
+    for category in eval(tname).objects.all():  
         for resdet in Dcotizacion.objects.filter(codpro=category.codigo).values('master','codpro').annotate(Sum('cantidad')):
             key=str(resdet['master'])+resdet['codpro']
-            #category.codigo
-            #print (resdet['master'],resdet['codpro'],[round(resdet['cantidad__sum'],2)])
-            dic_detailprod[key] = [resdet['codpro'],[round(resdet['cantidad__sum'],2)]]
-    
+            dic_sumdetailprod[key] = [resdet['codpro'],[round(resdet['cantidad__sum'],2)]]   
+    return dic_sumdetailprod
+
+def procdic_detailprod(tname):
+    dic_detailprod = {}
+    for category in eval(tname).objects.all():
+        for resdet in Dcotizacion.objects.filter(codpro=category.codigo).values():
+            key=str(resdet['codigo'])+resdet['codpro']
+            dic_detailprod[key] = [str(resdet['codigo']),resdet['codpro'],resdet['descripcion'],resdet['cantidad'],resdet['precio'],resdet['imptotal']]
     return dic_detailprod
-    #print(dic_detailprod)
