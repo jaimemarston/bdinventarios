@@ -227,7 +227,8 @@ class Material(models.Model):
     monedacompra = models.IntegerField(default=0)  # soles,dolares,euros,yen
     desmonecompra = models.CharField(max_length=50, null=True, blank=True)
     tipo = models.CharField(max_length=60, blank=True, null=True)
-
+    stockmin = models.DecimalField(default=0, max_digits=15, decimal_places=2)
+    stockmax = models.DecimalField(default=0, max_digits=15, decimal_places=2)
 
 class Articulo(models.Model):
     codigo = models.CharField(max_length=30)
@@ -259,8 +260,9 @@ class Articulo(models.Model):
     monedaventa = models.IntegerField(default=0)  # soles,dolares,euros,yen
     desmoneventa = models.CharField(max_length=50, null=True, blank=True)
     tipo = models.CharField(max_length=60, blank=True, null=True)
-
-
+    stockmin = models.DecimalField(default=0, max_digits=15, decimal_places=2)
+    stockmax = models.DecimalField(default=0, max_digits=15, decimal_places=2)
+    
 class Centrodecosto1(models.Model):
     codigo = models.IntegerField()
     descripcion = models.CharField(max_length=60, blank=True, null=True)

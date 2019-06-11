@@ -28,7 +28,7 @@ class MaterialSerializer(serializers.ModelSerializer):
                   'cantidad', 'color', 'deposito',
                    'descolor','stock1','codbarra','stockalm1','stockalm2','stockalm3','afectoigv','preciocosto','precioventa', 
                    'aplicadscto','cc1','descc1','modelo','genero','talla','ruc','desruc','unimed',
-                   'desunimed','umdsali','umdsaliconv','monedacompra','desmonecompra','tipo')
+                   'desunimed','umdsali','umdsaliconv','monedacompra','desmonecompra','tipo','stockmin','stockmax')
 
 
 class ArticuloSerializer(serializers.ModelSerializer):
@@ -38,7 +38,7 @@ class ArticuloSerializer(serializers.ModelSerializer):
                   'cantidad', 'color', 'deposito',
                    'descolor','stock1','codbarra','stockalm1','stockalm2','stockalm3','afectoigv','preciocosto','precioventa', 
                    'aplicadscto','cc1','descc1','modelo','genero','talla','ruc','desruc','unimed',
-                   'desunimed','umdsali','umdsaliconv','monedaventa','desmoneventa','tipo')
+                   'desunimed','umdsali','umdsaliconv','monedaventa','desmoneventa','tipo','stockmin','stockmax')
 
 class ClienteSerializer(serializers.ModelSerializer):
     class Meta:
