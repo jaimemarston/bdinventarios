@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.viewsets import ModelViewSet
 from django.db.models import Sum
 import xlwt
-
+import operator
 import datetime
 
 from gestionapp.models import (
@@ -601,8 +601,37 @@ class listaarticuloViewSet(viewsets.ModelViewSet):
         max_paginate_by = 100
         return Response(category_names)
 
-        # return response
 
+class alerta_stock_prod_ViewSet(viewsets.ModelViewSet):
+    # queryset = Blogpost.objects.all().order_by('date')
+    serializer_class = ArticuloSerializer
+
+    def get_queryset(self):
+        # Chances are, you're doing something more advanced here
+        # like filtering.
+        Articulo.objects.all()
+
+    # https://www.peterbe.com/plog/efficient-m2m-django-rest-framework
+    def list(self, request, *args, **kwargs):
+        # response = super().list(request, *args, **kwargs)
+        # qs = self.get_queryset()
+        # choices = {1: 'Inventario Inicial', 2: 'Ingreso Producto',3: 'Salida Producto',4: 'Anulado'}
+        start_date = self.request.query_params.get('from', None)
+        end_date = self.request.query_params.get('end', None)
+
+        start_date = datetime.datetime.strptime(start_date, '%Y-%m-%d')
+        end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d')
+        print(start_date, end_date)
+        # if start_date and end_date:
+        #     return Mcotizacion.objects.filter(fechadoc__range=(start_date, end_date))
+        # else:
+        #     return Mcotizacion.objects.all()
+
+        category_names = lista_stock('cantidad',start_date, end_date,True)
+
+        return Response(category_names)
+
+        # return response
 
 class listamaterialViewSet(viewsets.ModelViewSet):
     # queryset = Blogpost.objects.all().order_by('date')
@@ -654,7 +683,7 @@ class StockViewSet(viewsets.ModelViewSet):
         # else:
         #     return Mcotizacion.objects.all()
 
-        category_names = lista_stock(start_date, end_date)
+        category_names = lista_stock('talla',start_date, end_date)
 
         return Response(category_names)
 
@@ -980,7 +1009,7 @@ def export_xls_stock(request):
     return response
 
 
-def lista_stock(startdate=None, enddate=None):
+def lista_stock(order=None, startdate=None, enddate=None, stockmin=False):
     category_names = []
     dic_sumdetailprod = procdic_sumdetailprod('Articulo')
 
@@ -1027,10 +1056,28 @@ def lista_stock(startdate=None, enddate=None):
                 'ingresos': xingresos,
                 'salidas': xsalidas,
                 'saldo.actual': xsaldo,
+                'stockmin': category.stockmin,
                 }
 
         category_names.append(data)
-    # print (category_names)
+    print (type(category_names))
+    if not stockmin:
+        for foo in category_names:
+            del foo['stockmin']
+        #print (foo)
+        #return sorted(category_names, key=operator.itemgetter(12))
+    elif stockmin:
+        nitem=0
+        for foo in category_names:
+            del foo['inv.inicial']
+            del foo['ingresos']
+            del foo['salidas']
+        category_names = [key for key in category_names if float(key['saldo.actual'])>float(0) and float(key['stockmin'])>float(0) ]
+        category_names = [key for key in category_names if float(key['stockmin'])+float(15)>=float(key['saldo.actual'])]
+    
+        
+            
+    print (category_names)
     return category_names
 
 
