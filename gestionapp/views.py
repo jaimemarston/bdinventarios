@@ -626,7 +626,7 @@ class alerta_stock_prod_ViewSet(viewsets.ModelViewSet):
         #     return Mcotizacion.objects.filter(fechadoc__range=(start_date, end_date))
         # else:
         #     return Mcotizacion.objects.all()
-
+        
         category_names = lista_stock('cantidad',start_date, end_date,True)
 
         return Response(category_names)
@@ -1009,7 +1009,55 @@ def export_xls_stock(request):
     return response
 
 
-def lista_stock(order=None, startdate=None, enddate=None, stockmin=False):
+def export_xls_alerta_stock_prod(request):
+    nreport = 'alerta_stock_prod'
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename=' + nreport + '.xls'
+    
+    # Workbook is created
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet(nreport)
+
+    # Sheet header, first row
+    row_num = 0
+
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+
+    # Sheet body, remaining rows
+    font_style = xlwt.XFStyle()
+    category_names = lista_stock('cantidad',None, None,True)
+
+
+
+    columns = ['CODIGO', 'DESCRIPCION', 'TIPO', 'GENERO', 'MODELO', 'TALLA', 'DESCOLOR', 'DESUNIMED', 'SALDOACTUAL' ,'STOCKMIN' ]
+
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+
+    # add_sheet is used to create sheet. 
+    for row in category_names:
+        row_num += 1
+        # print(row_num,col_num,row[col_num],font_style)
+        ws.write(row_num, 0, row['codigo'], font_style)
+        ws.write(row_num, 1, row['descripcion'], font_style)
+        ws.write(row_num, 2, row['tipo'], font_style)
+        ws.write(row_num, 3, row['genero'], font_style)
+        ws.write(row_num, 4, row['modelo'], font_style)
+        ws.write(row_num, 5, row['talla'], font_style)
+        ws.write(row_num, 6, row['descolor'], font_style)
+        ws.write(row_num, 7, row['desunimed'], font_style)
+        ws.write(row_num, 8, row['saldo.actual'], font_style)
+        ws.write(row_num, 9, row['stockmin'], font_style)
+
+
+        # ws.write(row_num, col_num, row[col_num], font_style)
+
+    wb.save(response)
+    return response
+
+
+def lista_stock(order=None, startdate=None, enddate=None, sistockmin=False):
     category_names = []
     dic_sumdetailprod = procdic_sumdetailprod('Articulo')
 
@@ -1060,24 +1108,24 @@ def lista_stock(order=None, startdate=None, enddate=None, stockmin=False):
                 }
 
         category_names.append(data)
-    print (type(category_names))
-    if not stockmin:
+    #print (type(category_names))
+    if not sistockmin:
         for foo in category_names:
             del foo['stockmin']
         #print (foo)
         #return sorted(category_names, key=operator.itemgetter(12))
-    elif stockmin:
+    elif sistockmin:
         nitem=0
         for foo in category_names:
             del foo['inv.inicial']
             del foo['ingresos']
             del foo['salidas']
         category_names = [key for key in category_names if float(key['saldo.actual'])>float(0) and float(key['stockmin'])>float(0) ]
-        category_names = [key for key in category_names if float(key['stockmin'])+float(15)>=float(key['saldo.actual'])]
+        category_names = [key for key in category_names if float(key['stockmin'])>=float(key['saldo.actual'])]
     
         
             
-    print (category_names)
+    #print (category_names)
     return category_names
 
 

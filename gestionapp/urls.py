@@ -80,7 +80,10 @@ urlpatterns = [
     url(r'^xls_proddetalle$', views.export_xls_proddetalle, name='productos'),
     #1.5 Proveedores
     url(r'^xls_control_pagos$', views.export_xls_control_pagos, name='proveedores'),
-    
+     #1.5 Alerta Stock
+    url(r'^xls_alerta_stock_prod$', views.export_xls_alerta_stock_prod, name='proveedores'),
+
+
     #2. Lista Materiales 
     url(r'^export_xls$', views.export_users_xls, name='materiales'),
     #2.3 Kerdex Resumen
