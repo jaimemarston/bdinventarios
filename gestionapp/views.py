@@ -631,7 +631,35 @@ class alerta_stock_prod_ViewSet(viewsets.ModelViewSet):
 
         return Response(category_names)
 
-        # return response
+class alerta_stock_mat_ViewSet(viewsets.ModelViewSet):
+    # queryset = Blogpost.objects.all().order_by('date')
+    serializer_class = MaterialSerializer
+
+    def get_queryset(self):
+        # Chances are, you're doing something more advanced here
+        # like filtering.
+        Material.objects.all()
+
+    # https://www.peterbe.com/plog/efficient-m2m-django-rest-framework
+    def list(self, request, *args, **kwargs):
+        # response = super().list(request, *args, **kwargs)
+        # qs = self.get_queryset()
+        # choices = {1: 'Inventario Inicial', 2: 'Ingreso Producto',3: 'Salida Producto',4: 'Anulado'}
+        start_date = self.request.query_params.get('from', None)
+        end_date = self.request.query_params.get('end', None)
+
+        start_date = datetime.datetime.strptime(start_date, '%Y-%m-%d')
+        end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d')
+        print(start_date, end_date)
+        # if start_date and end_date:
+        #     return Mcotizacion.objects.filter(fechadoc__range=(start_date, end_date))
+        # else:
+        #     return Mcotizacion.objects.all()
+        
+        category_names = lista_stock_mat('cantidad',start_date, end_date,True)
+
+        return Response(category_names)
+
 
 class listamaterialViewSet(viewsets.ModelViewSet):
     # queryset = Blogpost.objects.all().order_by('date')
@@ -704,8 +732,18 @@ class Stock_matViewSet(viewsets.ModelViewSet):
         # response = super().list(request, *args, **kwargs)
         # qs = self.get_queryset()
         # choices = {1: 'Inventario Inicial', 2: 'Ingreso Producto',3: 'Salida Producto',4: 'Anulado'}
+        start_date = self.request.query_params.get('from', None)
+        end_date = self.request.query_params.get('end', None)
 
-        category_names = lista_stock_mat()
+        start_date = datetime.datetime.strptime(start_date, '%Y-%m-%d')
+        end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d')
+        print(start_date, end_date)
+        # if start_date and end_date:
+        #     return Mcotizacion.objects.filter(fechadoc__range=(start_date, end_date))
+        # else:
+        #     return Mcotizacion.objects.all()
+
+        category_names = lista_stock_mat('talla',start_date, end_date)
         return Response(category_names)
 
         # return response
@@ -1056,10 +1094,52 @@ def export_xls_alerta_stock_prod(request):
     wb.save(response)
     return response
 
+def export_xls_alerta_stock_mat(request):
+    nreport = 'alerta_stock_mat'
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename=' + nreport + '.xls'
+    
+    # Workbook is created
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet(nreport)
+
+    # Sheet header, first row
+    row_num = 0
+
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+
+    # Sheet body, remaining rows
+    font_style = xlwt.XFStyle()
+    category_names = lista_stock_mat('cantidad',None, None,True)
+
+
+
+    columns = ['CODIGO', 'DESCRIPCION', 'SALDOACTUAL' ,'STOCKMIN' ]
+
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+
+    # add_sheet is used to create sheet. 
+    for row in category_names:
+        row_num += 1
+        # print(row_num,col_num,row[col_num],font_style)
+        ws.write(row_num, 0, row['codigo'], font_style)
+        ws.write(row_num, 1, row['descripcion'], font_style)
+        ws.write(row_num, 2, row['saldo.actual'], font_style)
+        ws.write(row_num, 3, row['stockmin'], font_style)
+
+
+        # ws.write(row_num, col_num, row[col_num], font_style)
+
+    wb.save(response)
+    return response
+
+
 
 def lista_stock(order=None, startdate=None, enddate=None, sistockmin=False):
     category_names = []
-    dic_sumdetailprod = procdic_sumdetailprod('Articulo')
+    dic_sumdetailprod = procdic_sumdetailprod('Articulo','Dcotizacion')
 
     for category in Articulo.objects.all().order_by('talla'):
         xinvini = 0
@@ -1108,12 +1188,10 @@ def lista_stock(order=None, startdate=None, enddate=None, sistockmin=False):
                 }
 
         category_names.append(data)
-    #print (type(category_names))
+    
     if not sistockmin:
         for foo in category_names:
             del foo['stockmin']
-        #print (foo)
-        #return sorted(category_names, key=operator.itemgetter(12))
     elif sistockmin:
         nitem=0
         for foo in category_names:
@@ -1123,29 +1201,29 @@ def lista_stock(order=None, startdate=None, enddate=None, sistockmin=False):
         category_names = [key for key in category_names if float(key['saldo.actual'])>float(0) and float(key['stockmin'])>float(0) ]
         category_names = [key for key in category_names if float(key['stockmin'])>=float(key['saldo.actual'])]
     
-        
-            
-    #print (category_names)
     return category_names
 
 
-def lista_stock_mat():
+def lista_stock_mat(order=None, startdate=None, enddate=None, sistockmin=False):
     category_names = []
+    dic_sumdetailprod = procdic_sumdetailprod('Material','Dmateriales')
 
     for category in Material.objects.all():
         xinvini = 0
         xingresos = 0
         xsalidas = 0
         xsaldo = 0
-        for estado in Mmateriales.objects.all():
+        if startdate and enddate:
+            queryset = Mmateriales.objects.filter(fechadoc__range=(startdate, enddate))
+        else:
+            queryset = Mmateriales.objects.all()
+        for estado in queryset:
             nestado = estado.estado
-            pkmaster = estado.id
-
-            detail_material = Dmateriales.objects.filter(codpro=category.codigo, master=pkmaster).aggregate(
-                Sum('cantidad'))
-
-            valor_cantidad = detail_material['cantidad__sum'] if type(detail_material['cantidad__sum']) != type(
-                None) else 0
+            pkmaster = str(estado.id) + category.codigo
+            valor_cantidad = 0
+            if pkmaster in dic_sumdetailprod:
+                valor_cantidad = sum(dic_sumdetailprod[pkmaster][1]) if type(dic_sumdetailprod[pkmaster][1]) != type(
+                    None) else 0
 
             invini = valor_cantidad if nestado == 1 else 0
             ingresos = valor_cantidad if nestado == 2 else 0
@@ -1162,17 +1240,29 @@ def lista_stock_mat():
                 'ingresos': xingresos,
                 'salidas': xsalidas,
                 'saldo.actual': xsaldo,
+                'stockmin': category.stockmin,
                 }
 
         category_names.append(data)
-
+    if not sistockmin:
+        for foo in category_names:
+            del foo['stockmin']
+    elif sistockmin:
+        nitem=0
+        for foo in category_names:
+            del foo['inv.inicial']
+            del foo['ingresos']
+            del foo['salidas']
+        category_names = [key for key in category_names if float(key['saldo.actual'])>float(0) and float(key['stockmin'])>float(0) ]
+        category_names = [key for key in category_names if float(key['stockmin'])>=float(key['saldo.actual'])]
+    
     return category_names
 
 
 def articulos_detalle():
     category_names = []
-    dic_sumdetailprod = procdic_sumdetailprod('Articulo')
-    dic_detailprod = procdic_detailprod('Articulo')
+    dic_sumdetailprod = procdic_sumdetailprod('Articulo','Dcotizacion')
+    dic_detailprod = procdic_detailprod('Articulo','Dcotizacion')
 
     for category in Articulo.objects.all().order_by('talla'):
         xinvini = 0
@@ -1182,23 +1272,14 @@ def articulos_detalle():
         datail = []
         for estado in Mcotizacion.objects.all():
             nestado = estado.estado
-            # pkmaster = estado.id
             choices = {1: 'Inventario Inicial', 2: 'Ingreso Producto', 3: 'Salida Producto', 4: 'Anulado'}
             seltipo = choices.get(nestado, 'default')
             pkmaster = str(estado.id) + category.codigo
-            # detail_cotizacion = Dcotizacion.objects.filter(codpro=category.codigo,master=pkmaster).aggregate(Sum('cantidad'))
-            # valor_cantidad = detail_cotizacion['cantidad__sum'] if  type(detail_cotizacion['cantidad__sum'])   != type(None) else 0
-
             valor_cantidad = 0
 
             if pkmaster in dic_sumdetailprod:
                 valor_cantidad = sum(dic_sumdetailprod[pkmaster][1]) if type(dic_sumdetailprod[pkmaster][1]) != type(
                     None) else 0
-
-                # detail_cotizacion = Dcotizacion.objects.filter(codpro=category.codigo,master=pkmaster).aggregate(Sum('cantidad'))
-
-            # valor_cantidad = detail_cotizacion['cantidad__sum'] if  type(detail_cotizacion['cantidad__sum'])   != type(None) else 0
-
             invini = valor_cantidad if nestado == 1 else 0
             ingresos = valor_cantidad if nestado == 2 else 0
             salidas = valor_cantidad if nestado == 3 else 0
@@ -1216,19 +1297,8 @@ def articulos_detalle():
                     "imptotal": dic_detailprod[pkmaster][5],
                 }
                 datail.append(datodet)
-            # for det in Dcotizacion.objects.filter(codpro=category.codigo,master=estado.id):
-            #    datodet = {
-            #            "id": 7,
-            #            "codigo": det.codigo,
-            #            "descripcion":seltipo,
-            #            "cantidad":det.cantidad,
-            #            "precio":det.precio,
-            #            "imptotal":det.imptotal,
-            #            }
-            #    datail.append(datodet)
 
         xsaldo = (xinvini + xingresos) - xsalidas
-        # print (category.codigo,valor_cantidad,nestado,xinvini,xingresos,xsalidas)
         data = {'codigo': category.codigo,
                 'descripcion': category.descripcion,
                 'unimed': category.unimed,
@@ -1238,14 +1308,14 @@ def articulos_detalle():
                 'salidas': xsalidas,
                 'saldo.actual': xsaldo,
                 "cotizaciones": datail}
-
         category_names.append(data)
-
     return category_names
 
 
 def materiales_detalle():
     category_names = []
+    dic_sumdetailprod = procdic_sumdetailprod('Material','Dmateriales')
+    dic_detailprod = procdic_detailprod('Material','Dmateriales')
 
     for category in Material.objects.all():
         xinvini = 0
@@ -1255,14 +1325,14 @@ def materiales_detalle():
         datail = []
         for estado in Mmateriales.objects.all():
             nestado = estado.estado
-            pkmaster = estado.id
+            pkmaster = str(estado.id) + category.codigo
             choices = {1: 'Inventario Inicial', 2: 'Ingreso Producto', 3: 'Salida Producto', 4: 'Anulado'}
             seltipo = choices.get(nestado, 'default')
-            detail_material = Dmateriales.objects.filter(codpro=category.codigo, master=pkmaster).aggregate(
-                Sum('cantidad'))
-
-            valor_cantidad = detail_material['cantidad__sum'] if type(detail_material['cantidad__sum']) != type(
-                None) else 0
+            
+            valor_cantidad = 0
+            if pkmaster in dic_sumdetailprod:
+                valor_cantidad = sum(dic_sumdetailprod[pkmaster][1]) if type(dic_sumdetailprod[pkmaster][1]) != type(
+                    None) else 0
 
             invini = valor_cantidad if nestado == 1 else 0
             ingresos = valor_cantidad if nestado == 2 else 0
@@ -1272,19 +1342,19 @@ def materiales_detalle():
             xingresos += ingresos
             xsalidas += salidas
 
-            for det in Dmateriales.objects.filter(codpro=category.codigo, master=pkmaster):
+            for det in dic_detailprod:
                 datodet = {
                     "id": 7,
-                    "codigo": det.codigo,
+                    "codigo": dic_detailprod[pkmaster][0],
                     "descripcion": seltipo,
-                    "cantidad": det.cantidad,
-                    "precio": det.precio,
-                    "imptotal": det.imptotal,
+                    "cantidad": dic_detailprod[pkmaster][3],
+                    "precio": dic_detailprod[pkmaster][4],
+                    "imptotal": dic_detailprod[pkmaster][5],
                 }
                 datail.append(datodet)
 
         xsaldo = (xinvini + xingresos) - xsalidas
-        # print (category.codigo,valor_cantidad,nestado,xinvini,xingresos,xsalidas)
+        
         data = {'codigo': category.codigo,
                 'descripcion': category.descripcion,
                 'unimed': category.unimed,
@@ -1312,7 +1382,7 @@ def control_pagos():
         for estado in Mcotizacion.objects.filter(ruc=category.ruc):
             nestado = estado.estado
             pkmaster = estado.id
-            nimppagado = estado.imppagado
+            nimppagado = estado.imppagado if estado.imppagado else 0
             choices = {1: 'Inventario Inicial', 2: 'Ingreso Producto', 3: 'Salida Producto', 4: 'Anulado'}
             seltipo = choices.get(nestado, 'default')
             detail_material = Dcotizacion.objects.filter(master=pkmaster).aggregate(Sum('cantidad'))
@@ -1361,31 +1431,33 @@ def control_pagos():
     return category_names
 
 
-def procdic_masterprod():
-    dic_masterprod = {}
-    for master in Mcotizacion.objects.all():
-        choices = {1: 'Inventario Inicial', 2: 'Ingreso Producto', 3: 'Salida Producto', 4: 'Anulado'}
-        seltipo = choices.get(master.estado, 'default')
-        dic_masterprod[master.id] = [master.estado, seltipo]
+# def procdic_masterprod():
+#     dic_masterprod = {}
+#     for master in Mcotizacion.objects.all():
+#         choices = {1: 'Inventario Inicial', 2: 'Ingreso Producto', 3: 'Salida Producto', 4: 'Anulado'}
+#         seltipo = choices.get(master.estado, 'default')
+#         dic_masterprod[master.id] = [master.estado, seltipo]
 
-    return dic_masterprod
-    # print(dic_detailprod)
+#     return dic_masterprod
 
-
-def procdic_sumdetailprod(tname):
+def procdic_sumdetailprod(tbase,tdetalle):
+    #tbase =Articulos
+    #tdetalle =Dcotizacion o mcotizacion
     dic_sumdetailprod = {}
-    for category in eval(tname).objects.all():
-        for resdet in Dcotizacion.objects.filter(codpro=category.codigo).values('master', 'codpro').annotate(
+    for category in eval(tbase).objects.all():
+        for resdet in eval(tdetalle).objects.filter(codpro=category.codigo).values('master', 'codpro').annotate(
                 Sum('cantidad')):
             key = str(resdet['master']) + resdet['codpro']
             dic_sumdetailprod[key] = [resdet['codpro'], [round(resdet['cantidad__sum'], 2)]]
     return dic_sumdetailprod
 
 
-def procdic_detailprod(tname):
+def procdic_detailprod(tbase,tdetalle):
+      #tbase =Articulos
+      #tdetalle =Dcotizacion
     dic_detailprod = {}
-    for category in eval(tname).objects.all():
-        for resdet in Dcotizacion.objects.filter(codpro=category.codigo).values():
+    for category in eval(tbase).objects.all():
+        for resdet in eval(tdetalle).objects.filter(codpro=category.codigo).values():
             key = str(resdet['codigo']) + resdet['codpro']
             dic_detailprod[key] = [str(resdet['codigo']), resdet['codpro'], resdet['descripcion'], resdet['cantidad'],
                                    resdet['precio'], resdet['imptotal']]

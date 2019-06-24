@@ -21,6 +21,7 @@ router.register(r'alerta_stock_prod', views.alerta_stock_prod_ViewSet, base_name
 router.register(r'lista_stock_mat', views.Stock_matViewSet, base_name='put-something-here', )
 router.register(r'lista_materiales', views.listamaterialViewSet, base_name='put-something-here', )
 router.register(r'lista_materiales_detalle', views.lista_materiales_detalleViewSet, base_name='put-something-here', )
+router.register(r'alerta_stock_mat', views.alerta_stock_mat_ViewSet, base_name='put-something-here', )
 
 #Proveedores
 router.register(r'control_pagos', views.control_pagosViewSet, base_name='put-something-here', )
@@ -90,6 +91,8 @@ urlpatterns = [
     url(r'^xls_stock_mat$', views.export_xls_stock_mat, name='materiales'),
     #2.4 Kerdex Detalle
      url(r'^xls_matdetalle$', views.export_xls_matdetalle, name='materiales'),
+
+     url(r'^xls_alerta_stock_mat$', views.export_xls_alerta_stock_mat, name='proveedores'),
    
   
     
