@@ -1378,16 +1378,24 @@ def control_pagos():
         xsaldo = 0
         nimppagado = 0
         nimpcobrado = 0
+        xnimpcobrado = 0
+        xnimppagado = 0
         datail = []
         for estado in Mcotizacion.objects.filter(ruc=category.ruc):
             nestado = estado.estado
             pkmaster = estado.id
             nimppagado = estado.imppagado if estado.imppagado else 0
+            if category.ruc == '000001':
+                   print  ('Movi Pagado',pkmaster,nimppagado)
+            xnimppagado += nimppagado 
             choices = {1: 'Inventario Inicial', 2: 'Ingreso Producto', 3: 'Salida Producto', 4: 'Anulado'}
             seltipo = choices.get(nestado, 'default')
             detail_material = Dcotizacion.objects.filter(master=pkmaster).aggregate(Sum('cantidad'))
 
             nimpcobrado_det = Dcotizacion.objects.filter(master=pkmaster).aggregate(Sum('imptotal'))
+            if category.ruc == '000001':
+               print  ('Movi Cobrado',pkmaster,nimpcobrado_det)
+
             nimpcobrado = nimpcobrado_det['imptotal__sum'] if type(nimpcobrado_det['imptotal__sum']) != type(
                 None) else 0
             valor_cantidad = detail_material['cantidad__sum'] if type(detail_material['cantidad__sum']) != type(
@@ -1397,6 +1405,7 @@ def control_pagos():
             ingresos = valor_cantidad if nestado == 2 else 0
             salidas = valor_cantidad if nestado == 3 else 0
 
+            xnimpcobrado += nimpcobrado
             xinvini += invini
             xingresos += ingresos
             xsalidas += salidas
@@ -1404,7 +1413,7 @@ def control_pagos():
             for det in Dcotizacion.objects.filter(master=pkmaster):
                 datodet = {
                     "id": 7,
-                    "codigo": det.codigo,
+                    "codigo": "P-"+str(det.codigo),
                     "tipo": seltipo,
                     "codpro": det.codpro,
                     "descripcion": det.descripcion,
@@ -1412,8 +1421,12 @@ def control_pagos():
                     "precio": det.precio,
                     "imptotal": det.imptotal,
                 }
+
                 datail.append(datodet)
         xsaldo = (xinvini + xingresos) - xsalidas
+        # MATERIALES
+
+
         # print (category.codigo,valor_cantidad,nestado,xinvini,xingresos,xsalidas)
         data = {'codigo': category.ruc,
                 'descripcion': category.nombre,
@@ -1421,9 +1434,9 @@ def control_pagos():
                 'ingresos': xingresos,
                 'salidas': xsalidas,
                 'saldo.actual': xsaldo,
-                'importecobrado': nimpcobrado,
-                'importepagado': nimppagado,
-                'saldo_importe': nimppagado - nimpcobrado,
+                'importecobrado': xnimpcobrado,
+                'importepagado': xnimppagado,
+                'saldo_importe': xnimppagado - xnimpcobrado,
                 "cotizaciones": datail}
 
         category_names.append(data)
