@@ -1423,17 +1423,58 @@ def control_pagos():
                 }
 
                 datail.append(datodet)
+
         xsaldo = (xinvini + xingresos) - xsalidas
+
         # MATERIALES
+        for estado in Mmateriales.objects.filter(ruc=category.ruc):
+            nestado = estado.estado
+            pkmaster = estado.id
+            nimppagado = estado.imppagado if estado.imppagado else 0
+            # if category.ruc == '000001':
+            #        print  ('Movi Pagado',pkmaster,nimppagado)
+            xnimppagado += nimppagado 
+            choices = {1: 'Inventario Inicial', 2: 'Ingreso Producto', 3: 'Salida Producto', 4: 'Anulado'}
+            seltipo = choices.get(nestado, 'default')
+            detail_material = Dmateriales.objects.filter(master=pkmaster).aggregate(Sum('cantidad'))
+
+            nimpcobrado_det = Dmateriales.objects.filter(master=pkmaster).aggregate(Sum('imptotal'))
+            # if category.ruc == '000001':
+            #    print  ('Movi Cobrado',pkmaster,nimpcobrado_det)
+
+            nimpcobrado = nimpcobrado_det['imptotal__sum'] if type(nimpcobrado_det['imptotal__sum']) != type(
+                None) else 0
+            valor_cantidad = detail_material['cantidad__sum'] if type(detail_material['cantidad__sum']) != type(
+                None) else 0
+
+            invini = valor_cantidad if nestado == 1 else 0
+            ingresos = valor_cantidad if nestado == 2 else 0
+            salidas = valor_cantidad if nestado == 3 else 0
+
+            xnimpcobrado += nimpcobrado
+            xinvini += invini
+            xingresos += ingresos
+            xsalidas += salidas
+
+            for det in Dmateriales.objects.filter(master=pkmaster):
+                datodet = {
+                    "id": 7,
+                    "codigo": "M-"+str(det.codigo),
+                    "tipo": seltipo,
+                    "codpro": det.codpro,
+                    "descripcion": det.descripcion,
+                    "cantidad": det.cantidad,
+                    "precio": det.precio,
+                    "imptotal": det.imptotal,
+                }
+
+                datail.append(datodet)
 
 
         # print (category.codigo,valor_cantidad,nestado,xinvini,xingresos,xsalidas)
         data = {'codigo': category.ruc,
                 'descripcion': category.nombre,
                 'inv.inicial': xinvini,
-                'ingresos': xingresos,
-                'salidas': xsalidas,
-                'saldo.actual': xsaldo,
                 'importecobrado': xnimpcobrado,
                 'importepagado': xnimppagado,
                 'saldo_importe': xnimppagado - xnimpcobrado,
