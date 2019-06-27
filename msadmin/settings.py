@@ -24,7 +24,7 @@ SECRET_KEY = 'l*)bi@k9_(ri0s&mxsz^-doolu&y_k@(zunqupdf=^c13cw73b'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['marstoncloud.com','188.166.63.89', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost','188.166.63.89', '127.0.0.1',]
 
 # Application definition
 
