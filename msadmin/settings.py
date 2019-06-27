@@ -24,7 +24,7 @@ SECRET_KEY = 'l*)bi@k9_(ri0s&mxsz^-doolu&y_k@(zunqupdf=^c13cw73b'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['188.166.63.89', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['marstoncloud.com','188.166.63.89', 'localhost', '127.0.0.1']
 
 # Application definition
 
@@ -166,6 +166,15 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+#SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+
+CSRF_COOKIE_SECURE = True
+
+SECURE_SSL_REDIRECT = True
 
 LANGUAGE_CODE = "es-es"
 
