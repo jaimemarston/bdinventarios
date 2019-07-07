@@ -143,7 +143,7 @@ class ClienteListMasivo(viewsets.ModelViewSet):
 
 
 class ProveedorList(generics.ListCreateAPIView):
-    queryset = Proveedor.objects.all()
+    queryset = Proveedor.objects.all().order_by('nombre')
     serializer_class = ProveedorSerializer
 
     # para filtrar datos
