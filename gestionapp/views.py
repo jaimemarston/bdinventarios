@@ -143,10 +143,10 @@ class ClienteListMasivo(viewsets.ModelViewSet):
 
 
 class ProveedorList(generics.ListCreateAPIView):
-    queryset = Proveedor.objects.all().order_by('nombre')
+    queryset = Proveedor.objects.all()
     serializer_class = ProveedorSerializer
 
-    # para filtrar datos
+    # para filtrar datos ultimo
     """
         # bloquea permisos para usar token
     # permission_classes = (IsAuthenticated,)
