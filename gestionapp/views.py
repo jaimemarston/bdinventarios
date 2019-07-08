@@ -434,8 +434,8 @@ class CotizacionViewSet(viewsets.ModelViewSet):
         month = self.request.query_params.get('month', None)
         if month:
             month = int(month) + 1
-            return Mcotizacion.objects.filter(fechadoc__month=month)
-        return Mcotizacion.objects.all()
+            return Mcotizacion.objects.filter(fechadoc__month=month).order_by('codigo')
+        return Mcotizacion.objects.order_by('codigo')
 
 
 class ListViewParam(generics.ListCreateAPIView):
@@ -1475,6 +1475,9 @@ def control_pagos():
         data = {'codigo': category.ruc,
                 'descripcion': category.nombre,
                 'inv.inicial': xinvini,
+                'ingresos': xingresos,
+                'salidas': xsalidas,
+                'saldo.actual': xsaldo,
                 'importecobrado': xnimpcobrado,
                 'importepagado': xnimppagado,
                 'saldo_importe': xnimppagado - xnimpcobrado,

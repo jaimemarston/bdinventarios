@@ -223,3 +223,4 @@ modules.xml
 .idea/sonarlint
 
 # End of https://www.gitignore.io/api/django,pycharm+all
+*.sqlite3
