@@ -1381,9 +1381,11 @@ def control_pagos():
         xnimpcobrado = 0
         xnimppagado = 0
         datail = []
+        xtipogrupo= "P" if category.grupo == "PROVEEDOR" else "C"
         for estado in Mcotizacion.objects.filter(ruc=category.ruc):
             nestado = estado.estado
             pkmaster = estado.id
+            
             nimppagado = estado.imppagado if estado.imppagado else 0
             if category.ruc == '000001':
                    print  ('Movi Pagado',pkmaster,nimppagado)
@@ -1480,7 +1482,7 @@ def control_pagos():
                 'saldo.actual': xsaldo,
                 'importecobrado': xnimpcobrado,
                 'importepagado': xnimppagado,
-                'saldo_importe': xnimpcobrado-xnimppagado,
+                'saldo_importe': xnimpcobrado-xnimppagado if xtipogrupo == "C" else xnimppagado-xnimpcobrado ,
                 "cotizaciones": datail}
 
         category_names.append(data)
