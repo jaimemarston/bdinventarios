@@ -224,3 +224,5 @@ modules.xml
 
 # End of https://www.gitignore.io/api/django,pycharm+all
 *.sqlite3
+dbinventario.sqlite3
+*.sqlite3
