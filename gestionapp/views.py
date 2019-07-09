@@ -1413,7 +1413,7 @@ def control_pagos():
             for det in Dcotizacion.objects.filter(master=pkmaster):
                 datodet = {
                     "id": 7,
-                    "codigo": "P-"+str(det.codigo),
+                    "codigo": "PS-" +str(det.codigo) if nestado==3 else "PI-"+str(det.codigo),
                     "tipo": seltipo,
                     "codpro": det.codpro,
                     "descripcion": det.descripcion,
@@ -1459,7 +1459,7 @@ def control_pagos():
             for det in Dmateriales.objects.filter(master=pkmaster):
                 datodet = {
                     "id": 7,
-                    "codigo": "M-"+str(det.codigo),
+                    "codigo": "MS-" +str(det.codigo) if nestado==3 else "MI-"+str(det.codigo),
                     "tipo": seltipo,
                     "codpro": det.codpro,
                     "descripcion": det.descripcion,
@@ -1480,7 +1480,7 @@ def control_pagos():
                 'saldo.actual': xsaldo,
                 'importecobrado': xnimpcobrado,
                 'importepagado': xnimppagado,
-                'saldo_importe': xnimppagado - xnimpcobrado,
+                'saldo_importe': xnimpcobrado-xnimppagado,
                 "cotizaciones": datail}
 
         category_names.append(data)
