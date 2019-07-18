@@ -465,6 +465,14 @@ class MaterialesViewSet(viewsets.ModelViewSet):
     queryset = Mmateriales.objects.all()
     serializer_class = MmaterialesSerializer
 
+    def get_queryset(self):
+        month = self.request.query_params.get('month', None)
+        if month:
+            month = int(month) + 1
+            return Mmateriales.objects.filter(fechadoc__month=month).order_by('codigo')
+        return Mmateriales.objects.order_by('codigo')
+
+
 
 class lista_articulos_detalleViewSet(viewsets.ModelViewSet):
     # queryset = Blogpost.objects.all().order_by('date')
