@@ -157,6 +157,7 @@ class Camposcomunes_personal(models.Model):
     grupo = models.CharField(max_length=100, blank=True, null=True)
     pais = models.CharField(max_length=50, blank=True, null=True)
     idioma = models.CharField(max_length=50, blank=True, null=True)
+    cargo  = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:
         abstract = True
@@ -351,3 +352,122 @@ class CotizacionEstado(models.Model):
 class MaterialesEstado(models.Model):
     name = models.CharField(max_length=254)
     color = models.CharField(max_length=100)
+
+
+# RRHH
+
+class Plaempleados(Camposcomunes_personal, Camposcomunes_auditoria):
+    sueldo = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    turno = models.CharField(max_length=60, blank=True, null=True)
+
+class Plaadelantos(models.Model):
+    codigo = models.CharField(max_length=15, blank=True, null=True)
+    codemp = models.CharField(max_length=100, blank=True, null=True)
+    nombre = models.CharField(max_length=100, blank=True, null=True)
+    fechaini = models.DateField(null=True, blank=True)
+    fechafin = models.DateField(null=True, blank=True)
+    fechagen = models.DateField(null=True, blank=True)
+    turno = models.CharField(max_length=15, blank=True, null=True)
+    importe = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+
+class Pladescuentos(models.Model):
+    codigo = models.CharField(max_length=15, blank=True, null=True)
+    codemp = models.CharField(max_length=100, blank=True, null=True)
+    nombre = models.CharField(max_length=100, blank=True, null=True)
+    fechaini = models.DateField(null=True, blank=True)
+    fechafin = models.DateField(null=True, blank=True)
+    fechagen = models.DateField(null=True, blank=True)
+    turno = models.CharField(max_length=15, blank=True, null=True)
+    importe = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+
+class Plaregistrosemanal(models.Model):
+    codigo = models.CharField(max_length=15, blank=True, null=True)
+    codemp = models.CharField(max_length=100, blank=True, null=True)
+    nombre = models.CharField(max_length=100, blank=True, null=True)
+    nsemana= models.CharField(max_length=100, blank=True, null=True)
+    fechaini = models.DateField(null=True, blank=True)
+    fechafin = models.DateField(null=True, blank=True)
+    fechagen = models.DateField(null=True, blank=True)
+    turno = models.CharField(max_length=15, blank=True, null=True)
+    importe = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+
+#Calculo semana e importa horas
+class Placalculosemanal(models.Model):
+    codigo = models.CharField(max_length=15, blank=True, null=True)
+    codemp = models.CharField(max_length=100, blank=True, null=True)
+    nombre = models.CharField(max_length=100, blank=True, null=True)
+    fechaini = models.DateField(null=True, blank=True)
+    fechafin = models.DateField(null=True, blank=True)
+    nsemana= models.CharField(max_length=100, blank=True, null=True)
+    fechagen = models.DateField(null=True, blank=True)
+    codcargo = models.CharField(max_length=15, blank=True, null=True)
+    descargo = models.CharField(max_length=60, blank=True, null=True)
+    centrocosto = models.CharField(max_length=15, blank=True, null=True)
+    descentrocosto = models.CharField(max_length=60, blank=True, null=True)
+    turno = models.CharField(max_length=15, blank=True, null=True)
+    sueldo = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    rotativa = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    inyectoria = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    impdia1 = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    hrsdia1 = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    impdia2 = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    hrsdia2 = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    impdia3 = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    hrsdia3 = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    impdia4 = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    hrsdia4= models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    impdia5 = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    hrsdia5 = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    impdia6 = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    hrsdia6 = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    impdia7 = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    hrsdia7 = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    imptot = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    diastot = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    hrstot = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    hrsextrastasa1tot = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    hrsextrastasa2tot = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    hrsextrastasa3tot = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    totdcto = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    totalfinal = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+
+class Plmovpersonal(models.Model):
+    codigo = models.CharField(max_length=15, blank=True, null=True)
+    codemp = models.CharField(max_length=100, blank=True, null=True)
+    nombre = models.CharField(max_length=100, blank=True, null=True)
+    cc = models.CharField(max_length=100, blank=True, null=True)
+    descc = models.CharField(max_length=100, blank=True, null=True)
+    fechaini = models.DateField(null=True, blank=True)
+    fechafin = models.DateField(null=True, blank=True)   
+    turno = models.CharField(max_length=15, blank=True, null=True)
+    importe = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    master = models.ForeignKey(Plaempleados, related_name='movpersonal', on_delete=models.CASCADE, null=True)
+
+class Pldatosreloj(models.Model):
+    codigo = models.CharField(max_length=15, blank=True, null=True)
+    codemp = models.CharField(max_length=100, blank=True, null=True)
+    nombre = models.CharField(max_length=100, blank=True, null=True)
+    fechaini = models.DateField(null=True, blank=True)
+    fechafin = models.DateField(null=True, blank=True)
+    hrentrada = models.CharField(max_length=100, blank=True, null=True)
+    hrinidesc = models.CharField(max_length=100, blank=True, null=True)
+    hrfindesc = models.CharField(max_length=100, blank=True, null=True)
+    hrsalida = models.CharField(max_length=100, blank=True, null=True)
+    hrtotal  = models.CharField(max_length=100, blank=True, null=True)
+    
+
+class Plsalarioscc(models.Model):
+    codigo = models.CharField(max_length=15, blank=True, null=True)
+    codemp = models.CharField(max_length=100, blank=True, null=True)
+    nombre = models.CharField(max_length=100, blank=True, null=True)
+    cc = models.CharField(max_length=100, blank=True, null=True)
+    descc = models.CharField(max_length=100, blank=True, null=True)
+    fechaini = models.DateField(null=True, blank=True)
+    fechafin = models.DateField(null=True, blank=True)   
+    turno = models.CharField(max_length=15, blank=True, null=True)
+    importe = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    #master = models.ForeignKey(Plaempleados, related_name='empleados', on_delete=models.CASCADE, null=True)
+    # salario x hora segun trabajo
+    # salario x hora extra tasa1 segun trabajo
+    # salario x hora extra tasa2 segun trabajo
+    # salario x hora feriados etc segun trabajo

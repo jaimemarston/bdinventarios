@@ -9,6 +9,8 @@ from . import views
 router = DefaultRouter()
 router.register(r'mcotizacion', views.CotizacionViewSet)
 router.register(r'mmateriales', views.MaterialesViewSet)
+router.register(r'mempleados', views.EmpleadosViewSet)
+
 router.register(r'cotizacion_estado', views.CotizacionEstadoViewSet)
 
 #Productos
@@ -24,10 +26,7 @@ router.register(r'lista_materiales_detalle', views.lista_materiales_detalleViewS
 router.register(r'alerta_stock_mat', views.alerta_stock_mat_ViewSet, base_name='put-something-here', )
 
 #Proveedores
-router.register(r'control_pagos', views.control_pagosViewSet, base_name='put-something-here', )
-
-
-     
+router.register(r'control_pagos', views.control_pagosViewSet, base_name='put-something-here', ) 
 
 
 urlpatterns = [
@@ -94,7 +93,14 @@ urlpatterns = [
 
      url(r'^xls_alerta_stock_mat$', views.export_xls_alerta_stock_mat, name='proveedores'),
    
-  
+    # RRHH
+
+    url(r'^empleado$', views.EmpleadoList.as_view()),
+    url(r'^empleado/(?P<pk>[0-9]+)$', views.EmpleadoDetail.as_view()),
+
+    url(r'^plmovpersonal$', views.PlmovpersonalList.as_view()),
+    url(r'^plmovpersonal/(?P<pk>[0-9]+)$', views.PlmovpersonalDetail.as_view()),
+
     
 
 ]

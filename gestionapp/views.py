@@ -11,7 +11,7 @@ import datetime
 from gestionapp.models import (
     Deposito, Material, Articulo, Cliente, Proveedor, Unidad,
     Mcotizacion, Dcotizacion, Mmateriales, Dmateriales,
-    Clientesdireccion, Banco, MaterialesEstado,
+    Clientesdireccion, Banco, MaterialesEstado, Plaempleados, Plmovpersonal,
     CotizacionEstado)
 
 from gestionapp.serializers import (
@@ -21,7 +21,8 @@ from gestionapp.serializers import (
     MmaterialesSerializer, DmaterialesSerializer,
     ClientesdireccionSerializer,
     ClientesdirecciondetalleSerializer, BancoSerializer, MaterialesEstadoSerializer,
-    CotizacionEstadoSerializer)
+    CotizacionEstadoSerializer,
+    MempleadosSerializer,EmpleadoSerializer,PlmovpersonalSerializer)
 
 from django.contrib.auth.models import User
 from rest_framework import status
@@ -49,6 +50,31 @@ def masivo_list(request):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class EmpleadosViewSet(viewsets.ModelViewSet):
+    queryset = Plaempleados.objects.all()
+    serializer_class = MempleadosSerializer
+
+class EmpleadoList(generics.ListCreateAPIView):
+    queryset = Plaempleados.objects.all()
+    serializer_class = EmpleadoSerializer
+
+
+class EmpleadoDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Plaempleados.objects.all()
+    serializer_class = EmpleadoSerializer
+
+class PlmovpersonalList(generics.ListCreateAPIView):
+    queryset = Plmovpersonal.objects.all()
+    serializer_class = PlmovpersonalSerializer
+
+
+class PlmovpersonalDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Plmovpersonal.objects.all()
+    serializer_class = PlmovpersonalSerializer
+
+#INventarios
 
 
 class BancoList(generics.ListCreateAPIView):
@@ -1529,3 +1555,5 @@ def procdic_detailprod(tbase,tdetalle):
             dic_detailprod[key] = [str(resdet['codigo']), resdet['codpro'], resdet['descripcion'], resdet['cantidad'],
                                    resdet['precio'], resdet['imptotal']]
     return dic_detailprod
+
+

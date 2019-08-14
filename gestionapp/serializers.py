@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from gestionapp.models import Deposito, Material, Articulo, Cliente, Proveedor, Unidad, Programagastos, Mcotizacion, Dcotizacion, \
-    Clientesdireccion, Banco, CotizacionEstado, MaterialesEstado, Mmateriales, Dmateriales
+    Clientesdireccion, Banco, CotizacionEstado, MaterialesEstado, Mmateriales, Dmateriales, Plaempleados, Plmovpersonal
 
 
 class BancoSerializer(serializers.ModelSerializer):
@@ -170,3 +170,29 @@ class MaterialesEstadoSerializer(serializers.ModelSerializer):
     class Meta:
         model = MaterialesEstado
         fields = '__all__'
+
+#RRHH
+class EmpleadoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Plaempleados
+        fields = '__all__'
+
+class PlmovpersonalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Plmovpersonal
+        fields = '__all__'
+    
+
+class MempleadosSerializer(serializers.ModelSerializer):
+    movpersonal = PlmovpersonalSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Plaempleados
+        fields = ('id', 'codigo', 'nombre', 'telefono1', 'direccion', 'movpersonal')
+
+        # fields = ('id', 'codigo', 'ruc', 'nombre', 'telefono1', 'telefono2', 'telefono3', 'contacto', 'telcontacto', 'direccion', 
+        #           'correo', 'paginaweb', 'tipocc', 'destipocc', 'condcompvent', 'banco_nombre1', 'banco_cuenta1','banco_moneda1',
+        #           'banco_nombre2', 'banco_cuenta2','banco_moneda2', 'fechanac', 'fechaini', 'fechafin', 'grupo', 'pais',
+        #           'idioma', 'cargo', 'movpersonal')
+
+    
