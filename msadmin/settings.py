@@ -22,9 +22,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'l*)bi@k9_(ri0s&mxsz^-doolu&y_k@(zunqupdf=^c13cw73b'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['marstoncloud.com', 'localhost','188.166.63.89', '127.0.0.1',]
+ALLOWED_HOSTS = ['marstoncloud.com', 'www.marstoncloud.com', 'localhost','188.166.63.89', '127.0.0.1',]
 
 # Application definition
 
@@ -109,8 +109,9 @@ DATABASES = {
     }
 }
 """
-
 """
+# local
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -121,7 +122,10 @@ DATABASES = {
         'PORT': '5433',
     }
 }
+
 """
+
+# NUBE
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',

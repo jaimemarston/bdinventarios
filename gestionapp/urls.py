@@ -94,6 +94,9 @@ urlpatterns = [
      url(r'^xls_alerta_stock_mat$', views.export_xls_alerta_stock_mat, name='proveedores'),
    
     # RRHH
+    
+    url(r'^datosreloj$', views.PldatosrelojList.as_view()),
+    url(r'^datosreloj/uploadfiles$', views.DatosrelojUploadFile.as_view()),
 
     url(r'^empleado$', views.EmpleadoList.as_view()),
     url(r'^empleado/(?P<pk>[0-9]+)$', views.EmpleadoDetail.as_view()),

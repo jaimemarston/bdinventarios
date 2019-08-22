@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from gestionapp.models import Deposito, Material, Articulo, Cliente, Proveedor, Unidad, Programagastos, Mcotizacion, Dcotizacion, \
-    Clientesdireccion, Banco, CotizacionEstado, MaterialesEstado, Mmateriales, Dmateriales, Plaempleados, Plmovpersonal
+    Clientesdireccion, Banco, CotizacionEstado, MaterialesEstado, Mmateriales, Dmateriales, Plaempleados, Plmovpersonal, Pldatosreloj
 
 
 class BancoSerializer(serializers.ModelSerializer):
@@ -172,6 +172,7 @@ class MaterialesEstadoSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 #RRHH
+
 class EmpleadoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Plaempleados
@@ -195,4 +196,8 @@ class MempleadosSerializer(serializers.ModelSerializer):
         #           'banco_nombre2', 'banco_cuenta2','banco_moneda2', 'fechanac', 'fechaini', 'fechafin', 'grupo', 'pais',
         #           'idioma', 'cargo', 'movpersonal')
 
+class PldatosrelojSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Pldatosreloj
+        fields = '__all__'
     

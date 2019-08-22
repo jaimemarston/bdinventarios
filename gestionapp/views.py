@@ -12,7 +12,7 @@ from gestionapp.models import (
     Deposito, Material, Articulo, Cliente, Proveedor, Unidad,
     Mcotizacion, Dcotizacion, Mmateriales, Dmateriales,
     Clientesdireccion, Banco, MaterialesEstado, Plaempleados, Plmovpersonal,
-    CotizacionEstado)
+    CotizacionEstado, Pldatosreloj)
 
 from gestionapp.serializers import (
     DepositoSerializer, MaterialSerializer, ArticuloSerializer, ClienteSerializer, ProveedorSerializer,
@@ -22,7 +22,7 @@ from gestionapp.serializers import (
     ClientesdireccionSerializer,
     ClientesdirecciondetalleSerializer, BancoSerializer, MaterialesEstadoSerializer,
     CotizacionEstadoSerializer,
-    MempleadosSerializer,EmpleadoSerializer,PlmovpersonalSerializer)
+    MempleadosSerializer,EmpleadoSerializer,PlmovpersonalSerializer,PldatosrelojSerializer)
 
 from django.contrib.auth.models import User
 from rest_framework import status
@@ -34,6 +34,8 @@ from rest_framework.decorators import action
 import base64
 from django.templatetags.static import static
 from django.http import HttpResponse
+from rest_framework.parsers import MultiPartParser
+from procesar import cargar_data
 
 # Create your views here.
 from gestionapp.utils import render_to_pdf, PDFTemplateView, image_as_base64
@@ -52,26 +54,44 @@ def masivo_list(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class PldatosrelojViewSet(viewsets.ModelViewSet):
+    queryset = Pldatosreloj.objects.all()
+    serializer_class = PldatosrelojSerializer
+
+class PldatosrelojList(generics.ListCreateAPIView):
+    queryset = Pldatosreloj.objects.all()
+    serializer_class = PldatosrelojSerializer
+
+class DatosrelojUploadFile(APIView):
+    parser_classes = (MultiPartParser,)
+    def post(self, request):
+        file = request.FILES['file']
+        #file_data = file.read();
+        cargar_data(file)
+        # Parse data
+        return Response(status=204)
+
+
 class EmpleadosViewSet(viewsets.ModelViewSet):
-    queryset = Plaempleados.objects.all()
+    queryset = Plaempleados.objects.all().order_by('codigo')
     serializer_class = MempleadosSerializer
 
 class EmpleadoList(generics.ListCreateAPIView):
-    queryset = Plaempleados.objects.all()
+    queryset = Plaempleados.objects.all().order_by('codigo')
     serializer_class = EmpleadoSerializer
 
 
 class EmpleadoDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Plaempleados.objects.all()
+    queryset = Plaempleados.objects.all().order_by('codigo')
     serializer_class = EmpleadoSerializer
 
 class PlmovpersonalList(generics.ListCreateAPIView):
-    queryset = Plmovpersonal.objects.all()
+    queryset = Plmovpersonal.objects.all().order_by('codigo')
     serializer_class = PlmovpersonalSerializer
 
 
 class PlmovpersonalDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Plmovpersonal.objects.all()
+    queryset = Plmovpersonal.objects.all().order_by('codigo')
     serializer_class = PlmovpersonalSerializer
 
 #INventarios
