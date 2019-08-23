@@ -1252,7 +1252,7 @@ def lista_stock(order=None, startdate=None, enddate=None, sistockmin=False):
             del foo['inv.inicial']
             del foo['ingresos']
             del foo['salidas']
-        category_names = [key for key in category_names if float(key['saldo.actual'])>float(0) and float(key['stockmin'])>float(0) ]
+        category_names = [key for key in category_names if float(key['saldo.actual'])>=float(0) and float(key['stockmin'])>float(0) ]
         category_names = [key for key in category_names if float(key['stockmin'])>=float(key['saldo.actual'])]
     
     return category_names
