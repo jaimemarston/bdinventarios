@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
 from gestionapp.models import Deposito, Material, Articulo, Cliente, Proveedor, Unidad, Programagastos, Mcotizacion, Dcotizacion, \
-    Clientesdireccion, Banco, CotizacionEstado, MaterialesEstado, Mmateriales, Dmateriales, Plaempleados, Plmovpersonal, Pldatosreloj
+    Clientesdireccion, Banco, CotizacionEstado, MaterialesEstado, \
+    Mmateriales, Dmateriales, Plaempleados, Plmovpersonal, Pldatosreloj, Pltareosemanal
 
 
 class BancoSerializer(serializers.ModelSerializer):
@@ -183,6 +184,23 @@ class PlmovpersonalSerializer(serializers.ModelSerializer):
         model = Plmovpersonal
         fields = '__all__'
     
+class PltareosemanalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Pltareosemanal
+        fields = '__all__'
+
+class PldatosrelojSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Pldatosreloj
+        fields = '__all__'
+
+class MtareoSerializer(serializers.ModelSerializer):
+    movreloj = PldatosrelojSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Pltareosemanal
+        fields = ('id', 'codigo', 'nombre', 'nsemana', 'fechaini', 'fechafin', 'movreloj')
+
 
 class MempleadosSerializer(serializers.ModelSerializer):
     movpersonal = PlmovpersonalSerializer(many=True, read_only=True)
@@ -196,8 +214,6 @@ class MempleadosSerializer(serializers.ModelSerializer):
         #           'banco_nombre2', 'banco_cuenta2','banco_moneda2', 'fechanac', 'fechaini', 'fechafin', 'grupo', 'pais',
         #           'idioma', 'cargo', 'movpersonal')
 
-class PldatosrelojSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Pldatosreloj
-        fields = '__all__'
-    
+
+
+        

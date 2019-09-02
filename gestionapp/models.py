@@ -380,9 +380,9 @@ class Pladescuentos(models.Model):
     turno = models.CharField(max_length=15, blank=True, null=True)
     importe = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
 
-class Plaregistrosemanal(models.Model):
+# se podria agregar horaini hora fin y hora refrigerio
+class Pltareosemanal(models.Model):
     codigo = models.CharField(max_length=15, blank=True, null=True)
-    codemp = models.CharField(max_length=100, blank=True, null=True)
     nombre = models.CharField(max_length=100, blank=True, null=True)
     nsemana= models.CharField(max_length=100, blank=True, null=True)
     fechaini = models.DateField(null=True, blank=True)
@@ -454,7 +454,8 @@ class Pldatosreloj(models.Model):
     hrfindesc = models.CharField(max_length=100, blank=True, null=True)
     hrsalida = models.CharField(max_length=100, blank=True, null=True)
     hrtotal  = models.CharField(max_length=100, blank=True, null=True)
-    
+    master = models.ForeignKey(Pltareosemanal, related_name='movreloj', on_delete=models.CASCADE, null=True)
+
 
 class Plsalarioscc(models.Model):
     codigo = models.CharField(max_length=15, blank=True, null=True)

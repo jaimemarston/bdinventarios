@@ -10,6 +10,7 @@ router = DefaultRouter()
 router.register(r'mcotizacion', views.CotizacionViewSet)
 router.register(r'mmateriales', views.MaterialesViewSet)
 router.register(r'mempleados', views.EmpleadosViewSet)
+router.register(r'mtareo', views.TareoViewSet),
 
 router.register(r'cotizacion_estado', views.CotizacionEstadoViewSet)
 
@@ -97,6 +98,10 @@ urlpatterns = [
     
     url(r'^datosreloj$', views.PldatosrelojList.as_view()),
     url(r'^datosreloj/uploadfiles$', views.DatosrelojUploadFile.as_view()),
+
+    url(r'^tareosemanal$', views.PltareosemanalList.as_view()),
+    
+
 
     url(r'^empleado$', views.EmpleadoList.as_view()),
     url(r'^empleado/(?P<pk>[0-9]+)$', views.EmpleadoDetail.as_view()),

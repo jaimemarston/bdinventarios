@@ -12,7 +12,7 @@ from gestionapp.models import (
     Deposito, Material, Articulo, Cliente, Proveedor, Unidad,
     Mcotizacion, Dcotizacion, Mmateriales, Dmateriales,
     Clientesdireccion, Banco, MaterialesEstado, Plaempleados, Plmovpersonal,
-    CotizacionEstado, Pldatosreloj)
+    CotizacionEstado, Pldatosreloj, Pltareosemanal)
 
 from gestionapp.serializers import (
     DepositoSerializer, MaterialSerializer, ArticuloSerializer, ClienteSerializer, ProveedorSerializer,
@@ -22,7 +22,8 @@ from gestionapp.serializers import (
     ClientesdireccionSerializer,
     ClientesdirecciondetalleSerializer, BancoSerializer, MaterialesEstadoSerializer,
     CotizacionEstadoSerializer,
-    MempleadosSerializer,EmpleadoSerializer,PlmovpersonalSerializer,PldatosrelojSerializer)
+    MempleadosSerializer,EmpleadoSerializer,PlmovpersonalSerializer,
+    PldatosrelojSerializer,PltareosemanalSerializer,MtareoSerializer)
 
 from django.contrib.auth.models import User
 from rest_framework import status
@@ -58,8 +59,19 @@ class PldatosrelojViewSet(viewsets.ModelViewSet):
     queryset = Pldatosreloj.objects.all()
     serializer_class = PldatosrelojSerializer
 
+
+class TareoViewSet(viewsets.ModelViewSet):
+    queryset = Pltareosemanal.objects.all().order_by('codigo')
+    serializer_class = MtareoSerializer
+
+
+class PltareosemanalList(generics.ListCreateAPIView):
+    queryset = Pltareosemanal.objects.all().order_by('codigo')
+    serializer_class = PltareosemanalSerializer
+
+
 class PldatosrelojList(generics.ListCreateAPIView):
-    queryset = Pldatosreloj.objects.all()
+    queryset = Pldatosreloj.objects.all().order_by('fechaini')
     serializer_class = PldatosrelojSerializer
 
 class DatosrelojUploadFile(APIView):
