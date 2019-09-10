@@ -12,7 +12,7 @@ from gestionapp.models import (
     Deposito, Material, Articulo, Cliente, Proveedor, Unidad,
     Mcotizacion, Dcotizacion, Mmateriales, Dmateriales,
     Clientesdireccion, Banco, MaterialesEstado, Plaempleados, Plmovpersonal,
-    CotizacionEstado, Pldatosreloj, Pltareosemanal)
+    CotizacionEstado, Pldatosreloj, Pltareosemanal,Plactacte)
 
 from gestionapp.serializers import (
     DepositoSerializer, MaterialSerializer, ArticuloSerializer, ClienteSerializer, ProveedorSerializer,
@@ -23,7 +23,7 @@ from gestionapp.serializers import (
     ClientesdirecciondetalleSerializer, BancoSerializer, MaterialesEstadoSerializer,
     CotizacionEstadoSerializer,
     MempleadosSerializer,EmpleadoSerializer,PlmovpersonalSerializer,
-    PldatosrelojSerializer,PltareosemanalSerializer,MtareoSerializer)
+    PldatosrelojSerializer,PltareosemanalSerializer,MtareoSerializer,PlctacteSerializer)
 
 from django.contrib.auth.models import User
 from rest_framework import status
@@ -84,6 +84,7 @@ class DatosrelojUploadFile(APIView):
         return Response(status=204)
 
 
+
 class EmpleadosViewSet(viewsets.ModelViewSet):
     queryset = Plaempleados.objects.all().order_by('codigo')
     serializer_class = MempleadosSerializer
@@ -105,6 +106,16 @@ class PlmovpersonalList(generics.ListCreateAPIView):
 class PlmovpersonalDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Plmovpersonal.objects.all().order_by('codigo')
     serializer_class = PlmovpersonalSerializer
+
+
+class PlctacteList(generics.ListCreateAPIView):
+    queryset = Plactacte.objects.all().order_by('codigo')
+    serializer_class = PlctacteSerializer
+
+
+class PlctacteDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Plactacte.objects.all().order_by('codigo')
+    serializer_class = PlctacteSerializer
 
 #INventarios
 
@@ -725,6 +736,31 @@ class alerta_stock_mat_ViewSet(viewsets.ModelViewSet):
         category_names = lista_stock_mat('cantidad',start_date, end_date,True)
 
         return Response(category_names)
+
+
+class calculaplanillaViewSet(viewsets.ModelViewSet):
+    # queryset = Blogpost.objects.all().order_by('date')
+    serializer_class = EmpleadoSerializer
+
+    def get_queryset(self):
+        # Chances are, you're doing something more advanced here 
+        # like filtering.
+        Plaempleados.objects.all()
+
+    # https://www.peterbe.com/plog/efficient-m2m-django-rest-framework
+    def list(self, request, *args, **kwargs):
+        # response = super().list(request, *args, **kwargs)
+        # qs = self.get_queryset()
+
+        category_names = []
+        for category in Plaempleados.objects.all():
+            data = {'codigo': category.codigo,
+                    'nombre': category.nombre}
+            category_names.append(data)
+
+        return Response(category_names)
+
+        # return response
 
 
 class listamaterialViewSet(viewsets.ModelViewSet):

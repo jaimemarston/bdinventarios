@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from gestionapp.models import Deposito, Material, Articulo, Cliente, Proveedor, Unidad, Programagastos, Mcotizacion, Dcotizacion, \
     Clientesdireccion, Banco, CotizacionEstado, MaterialesEstado, \
-    Mmateriales, Dmateriales, Plaempleados, Plmovpersonal, Pldatosreloj, Pltareosemanal
+    Mmateriales, Dmateriales, Plaempleados, Plmovpersonal, Pldatosreloj, Pltareosemanal, Plactacte
 
 
 class BancoSerializer(serializers.ModelSerializer):
@@ -183,7 +183,20 @@ class PlmovpersonalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Plmovpersonal
         fields = '__all__'
-    
+
+class PlctacteSerializer(serializers.ModelSerializer):
+     class Meta:
+        model = Plactacte
+        fields = '__all__'
+    # ctacte = PlctacteSerializer(many=True, read_only=True)
+
+    # class Meta:
+    #     model = Plaempleados
+    #     fields = ('id', 'codigo','codemp' 'nombre', 'codctacte', 'desctacte','cc','descc',
+    #     'fechaini','fechafin','fechagen','turno','importe','ctacte')
+
+
+
 class PltareosemanalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pltareosemanal
@@ -204,16 +217,14 @@ class MtareoSerializer(serializers.ModelSerializer):
 
 class MempleadosSerializer(serializers.ModelSerializer):
     movpersonal = PlmovpersonalSerializer(many=True, read_only=True)
+    ctacte = PlctacteSerializer(many=True, read_only=True)
 
     class Meta:
         model = Plaempleados
-        fields = ('id', 'codigo', 'nombre', 'telefono1', 'direccion', 'movpersonal')
+        fields = ('id', 'codigo', 'nombre', 'telefono1', 'direccion', 'movpersonal','ctacte')
 
         # fields = ('id', 'codigo', 'ruc', 'nombre', 'telefono1', 'telefono2', 'telefono3', 'contacto', 'telcontacto', 'direccion', 
         #           'correo', 'paginaweb', 'tipocc', 'destipocc', 'condcompvent', 'banco_nombre1', 'banco_cuenta1','banco_moneda1',
         #           'banco_nombre2', 'banco_cuenta2','banco_moneda2', 'fechanac', 'fechaini', 'fechafin', 'grupo', 'pais',
         #           'idioma', 'cargo', 'movpersonal')
 
-
-
-        

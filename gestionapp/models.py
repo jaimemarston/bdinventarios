@@ -360,6 +360,22 @@ class Plaempleados(Camposcomunes_personal, Camposcomunes_auditoria):
     sueldo = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
     turno = models.CharField(max_length=60, blank=True, null=True)
 
+
+class Plactacte(models.Model):
+    codigo = models.CharField(max_length=15, blank=True, null=True)
+    codemp = models.CharField(max_length=100, blank=True, null=True)
+    nombre = models.CharField(max_length=100, blank=True, null=True)
+    codctacte = models.CharField(max_length=15, blank=True, null=True)
+    desctacte = models.CharField(max_length=15, blank=True, null=True)
+    cc = models.CharField(max_length=100, blank=True, null=True)
+    descc = models.CharField(max_length=100, blank=True, null=True)
+    fechaini = models.DateField(null=True, blank=True)
+    fechafin = models.DateField(null=True, blank=True)
+    fechagen = models.DateField(null=True, blank=True)
+    turno = models.CharField(max_length=15, blank=True, null=True)
+    importe = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    master = models.ForeignKey(Plaempleados, related_name='ctacte', on_delete=models.CASCADE, null=True)
+
 class Plaadelantos(models.Model):
     codigo = models.CharField(max_length=15, blank=True, null=True)
     codemp = models.CharField(max_length=100, blank=True, null=True)
@@ -390,6 +406,7 @@ class Pltareosemanal(models.Model):
     fechagen = models.DateField(null=True, blank=True)
     turno = models.CharField(max_length=15, blank=True, null=True)
     importe = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    
 
 #Calculo semana e importa horas
 class Placalculosemanal(models.Model):

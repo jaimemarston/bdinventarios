@@ -29,6 +29,9 @@ router.register(r'alerta_stock_mat', views.alerta_stock_mat_ViewSet, base_name='
 #Proveedores
 router.register(r'control_pagos', views.control_pagosViewSet, base_name='put-something-here', ) 
 
+#Calculo de Planilla
+router.register(r'calcula_planilla', views.calculaplanillaViewSet, base_name='put-something-here', )
+#router.register(r'calcula_planilla/(?P<pk>[0-9]+)$', views.calculaplanillaViewSet, base_name='put-something-here', )
 
 urlpatterns = [
     url(r'^deposito$', views.DepositoList.as_view()),
@@ -109,6 +112,6 @@ urlpatterns = [
     url(r'^plmovpersonal$', views.PlmovpersonalList.as_view()),
     url(r'^plmovpersonal/(?P<pk>[0-9]+)$', views.PlmovpersonalDetail.as_view()),
 
-    
-
+    url(r'^plctacte$', views.PlctacteList.as_view()),
+    url(r'^plctacte/(?P<pk>[0-9]+)$', views.PlctacteDetail.as_view()),
 ]
