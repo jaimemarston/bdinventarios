@@ -455,8 +455,6 @@ class Plmovpersonal(models.Model):
     nombre = models.CharField(max_length=100, blank=True, null=True)
     cc = models.CharField(max_length=100, blank=True, null=True)
     descc = models.CharField(max_length=100, blank=True, null=True)
-    tipoctacte = models.CharField(max_length=100, blank=True, null=True)
-    destipoctacte = models.CharField(max_length=100, blank=True, null=True)
     fechaini = models.DateField(null=True, blank=True)
     fechafin = models.DateField(null=True, blank=True)   
     turno = models.CharField(max_length=15, blank=True, null=True)

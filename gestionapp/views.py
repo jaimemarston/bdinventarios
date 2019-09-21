@@ -74,6 +74,11 @@ class PldatosrelojList(generics.ListCreateAPIView):
     queryset = Pldatosreloj.objects.all().order_by('fechaini')
     serializer_class = PldatosrelojSerializer
 
+
+class PldatosrelojDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Pldatosreloj.objects.all().order_by('codigo')
+    serializer_class = PldatosrelojSerializer
+
 class DatosrelojUploadFile(APIView):
     parser_classes = (MultiPartParser,)
     def post(self, request):

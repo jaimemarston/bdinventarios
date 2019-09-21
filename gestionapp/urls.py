@@ -100,6 +100,7 @@ urlpatterns = [
     # RRHH
     
     url(r'^datosreloj$', views.PldatosrelojList.as_view()),
+    url(r'^datosreloj/(?P<pk>[0-9]+)$', views.PldatosrelojDetail.as_view()),
     url(r'^datosreloj/uploadfiles$', views.DatosrelojUploadFile.as_view()),
 
     url(r'^tareosemanal$', views.PltareosemanalList.as_view()),
