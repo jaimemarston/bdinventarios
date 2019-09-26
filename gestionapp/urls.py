@@ -10,6 +10,7 @@ router = DefaultRouter()
 router.register(r'mcotizacion', views.CotizacionViewSet)
 router.register(r'mmateriales', views.MaterialesViewSet)
 router.register(r'mempleados', views.EmpleadosViewSet)
+router.register(r'mrecetas', views.RecetasViewSet)
 router.register(r'mtareo', views.TareoViewSet),
 
 router.register(r'cotizacion_estado', views.CotizacionEstadoViewSet)
@@ -69,7 +70,6 @@ urlpatterns = [
     url(r'^generate_pdf/(?P<pk>\d+)/$', views.GeneratePDFCotizacionesDetail.as_view()),
     url(r'^generatemat_pdf/(?P<pk>\d+)/$', views.GeneratePDFMaterialesDetail.as_view()),
 
-    
     #http://localhost:8080/filtro/2019-05-13/2019-05-13/
     url(r'^filtro/(?P<sk>[\w\-\.]+)/(?P<ek>[\w\-\.]+)/$', views.ListViewParam.as_view()),
     #url(r'^filtro/(?P<pk>[\w\-\.]+)/(?P<sk>[\w\-\.]+)/(?P<ek>[\w\-\.]+)/$', views.ListViewParam.as_view()),
@@ -115,4 +115,13 @@ urlpatterns = [
 
     url(r'^plctacte$', views.PlctacteList.as_view()),
     url(r'^plctacte/(?P<pk>[0-9]+)$', views.PlctacteDetail.as_view()),
+
+    # Produccion
+
+    url(r'^recetas$', views.RecetasList.as_view()),
+    url(r'^recetas/(?P<pk>[0-9]+)$', views.RecetasDetail.as_view()),
+
+    url(r'^prodetrecetas$', views.ProdetrecetasList.as_view()),
+    url(r'^prodetrecetas/(?P<pk>[0-9]+)$', views.ProdetrecetasDetail.as_view()),
+
 ]

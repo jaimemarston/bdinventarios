@@ -3,7 +3,9 @@ import xlrd
 from gestionapp.models import Pldatosreloj,Pltareosemanal
 import math
 from datetime import datetime
+
 import time
+
 
 def cargar_data(data):
        
@@ -23,9 +25,14 @@ def cargar_data(data):
     
     #dfin = new_data[ ['codigo', 'codemp'] ]
     print("------INICIA for")
-    Pldatosreloj.objects.all().delete()
+    #importar index sacar Rango de Fecha a Importar
+    xmaster = 2
+
+    Pldatosreloj.objects.filter(master=xmaster).delete()
     dateformat = "%m/%d/%Y"
     #07:00 - 8.05
+    semana = Pltareosemanal.objects.get(id=xmaster)
+    print ('semana.fechaini',semana.fechaini,semana.fechafin)
     
     horacero = datetime.strptime('00:00', '%H:%M').time()
     horainiciomax = datetime.strptime('08:05', '%H:%M').time()
@@ -40,8 +47,7 @@ def cargar_data(data):
     horasalidamin = datetime.strptime('17:25', '%H:%M').time()
     horasalidamax = datetime.strptime('19:45', '%H:%M').time()
     
-    #importar index sacar Rango de Fecha a Importar
-    xmaster = 1
+    
     #11pm 8am
     resumen_horas = {}
     registro_resumen = []
@@ -81,22 +87,30 @@ def cargar_data(data):
             #key = xconcepto+'-'+str(int(cdni)) +'-'+ cfecha +'-'+ chora
             key = str(int(cdni)) +'-'+ cfecha
             #print (key,dhora)
-
-            resumen_horas[key] = [int(cdni), int(cdni), cnombre, dfecha, dfecha, hr1, hr2 , hr3, hr4 ]
-
+            #(df['birth_date'] > start_date) & (df['birth_date'] <= end_date)
+            if dfecha >= semana.fechaini and dfecha <= semana.fechafin:
+               resumen_horas[key] = [int(cdni), int(cdni), cnombre, dfecha, dfecha, hr1, hr2 , hr3, hr4 ]
+               #print ('dfecha', dfecha,semana.fechaini,semana.fechafin)
             
             #p = Pldatosreloj (codigo=int(cdni),codemp=int(cdni),nombre=cnombre,fechaini=dfecha)
            
             #p.save()
-    semana = Pltareosemanal.objects.get(id=xmaster)
+    
     for item in resumen_horas.items():
         #print ('codigo:',item[1][1],'nombre:',item[1][2],item[1][3],item[1][4],item[1][5],item[1][6],item[1][7],item[1][8])
-        
+        time1 = datetime.strptime(item[1][5],'%H:%M')
+        time2 = datetime.strptime(item[1][8],'%H:%M')
+        ctothoras = str(time2-time1)[:-3]
+
+        #ctothoras = '07:25'
+        #print(ctothoras)
+
 
         infdetalle = Pldatosreloj.objects.create(codigo=item[1][1], codemp=item[1][1],
         nombre=item[1][2],fechaini=item[1][3],fechafin=item[1][4],
-        hrentrada=item[1][5],hrinidesc=item[1][6],hrfindesc=item[1][7],hrsalida=item[1][8]) 
-       
+        hrentrada=item[1][5],hrinidesc=item[1][6],hrfindesc=item[1][7],hrsalida=item[1][8],
+        hrtotal=ctothoras)
+        # Agrega en Semana y en detalle movreloj se declara al inicio
         semana.movreloj.add(infdetalle)
 
 

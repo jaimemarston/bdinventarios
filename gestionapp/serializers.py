@@ -2,7 +2,8 @@ from rest_framework import serializers
 
 from gestionapp.models import Deposito, Material, Articulo, Cliente, Proveedor, Unidad, Programagastos, Mcotizacion, Dcotizacion, \
     Clientesdireccion, Banco, CotizacionEstado, MaterialesEstado, \
-    Mmateriales, Dmateriales, Plaempleados, Plmovpersonal, Pldatosreloj, Pltareosemanal, Plactacte
+    Mmateriales, Dmateriales, Plaempleados, Plmovpersonal, Pldatosreloj, Pltareosemanal, Plactacte, \
+    Prorecetas, Prodetrecetas
 
 
 class BancoSerializer(serializers.ModelSerializer):
@@ -171,6 +172,28 @@ class MaterialesEstadoSerializer(serializers.ModelSerializer):
     class Meta:
         model = MaterialesEstado
         fields = '__all__'
+
+
+#PRODUCCION
+
+class RecetasSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Prorecetas
+        fields = '__all__'
+
+class ProddetrecetasSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Prodetrecetas
+        fields = '__all__'
+
+class MrecetasSerializer(serializers.ModelSerializer):
+    movrecetas = ProddetrecetasSerializer(many=True, read_only=True)
+    #ctacte = PlctacteSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Prorecetas
+        fields = ('id', 'codigo', 'nombre', 'movrecetas')
+
 
 #RRHH
 

@@ -8,10 +8,12 @@ import xlwt
 import operator
 import datetime
 
+
+
 from gestionapp.models import (
     Deposito, Material, Articulo, Cliente, Proveedor, Unidad,
     Mcotizacion, Dcotizacion, Mmateriales, Dmateriales,
-    Clientesdireccion, Banco, MaterialesEstado, Plaempleados, Plmovpersonal,
+    Clientesdireccion, Banco, MaterialesEstado, Plaempleados, Plmovpersonal, Prorecetas, Prodetrecetas,
     CotizacionEstado, Pldatosreloj, Pltareosemanal,Plactacte)
 
 from gestionapp.serializers import (
@@ -22,7 +24,7 @@ from gestionapp.serializers import (
     ClientesdireccionSerializer,
     ClientesdirecciondetalleSerializer, BancoSerializer, MaterialesEstadoSerializer,
     CotizacionEstadoSerializer,
-    MempleadosSerializer,EmpleadoSerializer,PlmovpersonalSerializer,
+    MempleadosSerializer,EmpleadoSerializer,PlmovpersonalSerializer,RecetasSerializer, ProddetrecetasSerializer, MrecetasSerializer,
     PldatosrelojSerializer,PltareosemanalSerializer,MtareoSerializer,PlctacteSerializer)
 
 from django.contrib.auth.models import User
@@ -81,15 +83,46 @@ class PldatosrelojDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class DatosrelojUploadFile(APIView):
     parser_classes = (MultiPartParser,)
-    def post(self, request):
+    #def post(self, request):
+    def post(self, request, pk=None, *args, **kwargs):
+        
         file = request.FILES['file']
         #file_data = file.read();
         cargar_data(file)
         # Parse data
         return Response(status=204)
 
+class GeneratePDFMaterialesDetail(PDFTemplateView):
+    template_name = 'gestionapp/invoicemat.html'
+
+   
+
+#PRODUCCION
+
+class RecetasViewSet(viewsets.ModelViewSet):
+    queryset = Prorecetas.objects.all().order_by('codigo')
+    serializer_class = MrecetasSerializer
+
+class RecetasList(generics.ListCreateAPIView):
+    queryset = Prorecetas.objects.all().order_by('codigo')
+    serializer_class = RecetasSerializer
 
 
+class RecetasDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Prodetrecetas.objects.all().order_by('codigo')
+    serializer_class = ProddetrecetasSerializer
+
+class ProdetrecetasList(generics.ListCreateAPIView):
+    queryset = Prodetrecetas.objects.all().order_by('codigo')
+    serializer_class = ProddetrecetasSerializer
+
+
+class ProdetrecetasDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Prodetrecetas.objects.all().order_by('codigo')
+    serializer_class = ProddetrecetasSerializer
+
+
+#Empleados
 class EmpleadosViewSet(viewsets.ModelViewSet):
     queryset = Plaempleados.objects.all().order_by('codigo')
     serializer_class = MempleadosSerializer
@@ -756,12 +789,69 @@ class calculaplanillaViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         # response = super().list(request, *args, **kwargs)
         # qs = self.get_queryset()
+        
+        #plctacte ingresos gastos
+        #plmovpersonal sueldo 
+        xmaster = 2
+        semana = Pltareosemanal.objects.filter(id=xmaster)
+        days_ES = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
 
         category_names = []
         for category in Plaempleados.objects.all():
-            data = {'codigo': category.codigo,
-                    'nombre': category.nombre}
-            category_names.append(data)
+            sueldos = Plmovpersonal.objects.filter(codemp=category.codigo)
+            
+            if sueldos:
+               
+                cturno = sueldos[0].turno if sueldos[0].turno else ''
+                nimporte = sueldos[0].importe if sueldos[0].importe else 0.00
+                nimpdia1=nimpdia2=nimpdia3=nimpdia4=nimpdia5=nimpdia6=nimpdia7=0
+                detallesemana = Pldatosreloj.objects.filter(master=xmaster,codigo=category.codigo).order_by('fechaini')
+                for det in detallesemana:
+                    #if det.fechaini:
+                    fecha = det.fechaini
+                    #print('det.fechaini',type(fecha))
+                    #now = datetime.datetime.strptime(fecha, '%Y-%m-%d')
+                    cdia=fecha.strftime("{%w}").format(*days_ES)
+                    ndia=int(fecha.strftime("%w"))
+                    
+                    nhrsdia1 = det.hrtotal
+                    ntime = datetime.datetime.strptime(nhrsdia1,'%H:%M')
+                    
+                    if ntime.hour>8:
+                       print('ndiaultimo',type(ndia),cdia,fecha,nimporte,type(ntime.hour))    
+                       nimpdia1 = nimporte if ndia==1 else nimpdia1
+                       nimpdia2 = nimporte if ndia==2 else nimpdia2
+                       nimpdia3 = nimporte if ndia==3 else nimpdia3
+                       nimpdia4 = nimporte if ndia==4 else nimpdia4
+                       nimpdia5 = round((nimporte/2),2) if ndia==5 else nimpdia5
+                       nimpdia6 = nimporte if ndia==6 else nimpdia6
+                       nimpdia7 = nimporte if ndia==7 else nimpdia7
+                       
+                    
+
+                #print ('ndia',category.codigo,nimpdia4)
+                    # "fechaini": "2019-07-29",
+                    # "fechafin": "2019-07-29",
+                    # "hrentrada": "07:54",
+                    # "hrinidesc": "13:02",
+                    # "hrfindesc": "13:58",
+                    # "hrsalida": "19:42", 
+                ntotal = nimpdia1+nimpdia2+nimpdia3+nimpdia4+nimpdia5+nimpdia6+nimpdia7
+                data = {'codigo': category.codigo,
+                        'nombre': category.nombre,
+                        'turno': cturno,
+                        'sueldo':nimporte,
+                        'hrsextras': 00,
+                        'dia1': nimpdia1,
+                        'dia2': nimpdia2,
+                        'dia3': nimpdia3,
+                        'dia4': nimpdia4,
+                        'dia5': nimpdia5,
+                        'dia6': nimpdia6,
+                        'dia7': nimpdia7,
+                        'total': ntotal}
+                #nimpdia1=0
+                category_names.append(data)
 
         return Response(category_names)
 
