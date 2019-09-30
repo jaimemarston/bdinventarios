@@ -87,8 +87,10 @@ class DatosrelojUploadFile(APIView):
     def post(self, request, pk=None, *args, **kwargs):
         
         file = request.FILES['file']
+        id_ = request.POST.get('idMasterReloj', None)
+        print ('id_',id_, 'tamñ de archio', file.size)
         #file_data = file.read();
-        cargar_data(file)
+        cargar_data(file, int(id_))
         # Parse data
         return Response(status=204)
 
@@ -786,13 +788,14 @@ class calculaplanillaViewSet(viewsets.ModelViewSet):
         Plaempleados.objects.all()
 
     # https://www.peterbe.com/plog/efficient-m2m-django-rest-framework
-    def list(self, request, *args, **kwargs):
+    def list(self, request):
         # response = super().list(request, *args, **kwargs)
         # qs = self.get_queryset()
-        
+        print('id->', request.GET.get('master_id', 0))
         #plctacte ingresos gastos
         #plmovpersonal sueldo 
-        xmaster = 2
+        xmaster = int(request.GET.get('master_id', 0))
+
         semana = Pltareosemanal.objects.filter(id=xmaster)
         days_ES = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
 

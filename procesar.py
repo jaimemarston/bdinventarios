@@ -7,7 +7,7 @@ from datetime import datetime
 import time
 
 
-def cargar_data(data):
+def cargar_data(data, master_id):
        
     df = pd.read_excel (data) #for an earlier version of Excel, you may need to use the file extension of 'xls'
    
@@ -24,9 +24,9 @@ def cargar_data(data):
   
     
     #dfin = new_data[ ['codigo', 'codemp'] ]
-    print("------INICIA for")
+    print("------INICIA for",'master_id',master_id)
     #importar index sacar Rango de Fecha a Importar
-    xmaster = 2
+    xmaster = master_id
 
     Pldatosreloj.objects.filter(master=xmaster).delete()
     dateformat = "%m/%d/%Y"
