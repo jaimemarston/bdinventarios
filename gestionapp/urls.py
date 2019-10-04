@@ -11,6 +11,7 @@ router.register(r'mcotizacion', views.CotizacionViewSet)
 router.register(r'mmateriales', views.MaterialesViewSet)
 router.register(r'mempleados', views.EmpleadosViewSet)
 router.register(r'mrecetas', views.RecetasViewSet)
+router.register(r'mproduccion', views.ProduccionViewSet)
 router.register(r'mtareo', views.TareoViewSet),
 
 router.register(r'cotizacion_estado', views.CotizacionEstadoViewSet)
@@ -118,6 +119,13 @@ urlpatterns = [
 
     # Produccion
 
+    url(r'^produccion$', views.ProduccionList.as_view()),
+    url(r'^produccion/(?P<pk>[0-9]+)$', views.ProduccionDetail.as_view()),
+
+    url(r'^prodetproduccion$', views.ProdetproduccionList.as_view()),
+    url(r'^prodetproduccion/(?P<pk>[0-9]+)$', views.ProdetproduccionDetail.as_view()),
+    #
+    
     url(r'^recetas$', views.RecetasList.as_view()),
     url(r'^recetas/(?P<pk>[0-9]+)$', views.RecetasDetail.as_view()),
 

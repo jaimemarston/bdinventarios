@@ -356,11 +356,39 @@ class MaterialesEstado(models.Model):
 
 # PRODUCCION
 
+class Proproduccion(models.Model):
+    codigo = models.CharField(max_length=15, blank=True, null=True)
+    nombre = models.CharField(max_length=100, blank=True, null=True)
+    cc = models.CharField(max_length=100, blank=True, null=True)
+    descc = models.CharField(max_length=100, blank=True, null=True)
+    totcant = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    fechaini = models.DateField(null=True, blank=True)
+    fechafin = models.DateField(null=True, blank=True)   
+    turno = models.CharField(max_length=15, blank=True, null=True)
+
+class Prodetproduccion(models.Model):
+    codigo = models.CharField(max_length=15, blank=True, null=True)
+    codpro = models.CharField(max_length=100, blank=True, null=True)
+    nombre = models.CharField(max_length=100, blank=True, null=True)
+    cc = models.CharField(max_length=100, blank=True, null=True)
+    descc = models.CharField(max_length=100, blank=True, null=True)
+    fechaini = models.DateField(null=True, blank=True)
+    fechafin = models.DateField(null=True, blank=True)   
+    turno = models.CharField(max_length=15, blank=True, null=True)
+    cantidad = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    importe = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    activo = models.BooleanField(default=True)
+    hrsini = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    hrsfin = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
+    master = models.ForeignKey(Proproduccion, related_name='movproduccion', on_delete=models.CASCADE, null=True)
+
+
 class Prorecetas(models.Model):
     codigo = models.CharField(max_length=15, blank=True, null=True)
     nombre = models.CharField(max_length=100, blank=True, null=True)
     cc = models.CharField(max_length=100, blank=True, null=True)
     descc = models.CharField(max_length=100, blank=True, null=True)
+    totcant = models.DecimalField(default=0, max_digits=15, decimal_places=2, null=True, blank=True)
     fechaini = models.DateField(null=True, blank=True)
     fechafin = models.DateField(null=True, blank=True)   
     turno = models.CharField(max_length=15, blank=True, null=True)

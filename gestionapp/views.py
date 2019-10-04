@@ -14,7 +14,7 @@ from gestionapp.models import (
     Deposito, Material, Articulo, Cliente, Proveedor, Unidad,
     Mcotizacion, Dcotizacion, Mmateriales, Dmateriales,
     Clientesdireccion, Banco, MaterialesEstado, Plaempleados, Plmovpersonal, Prorecetas, Prodetrecetas,
-    CotizacionEstado, Pldatosreloj, Pltareosemanal,Plactacte)
+    Proproduccion, Prodetproduccion, CotizacionEstado, Pldatosreloj, Pltareosemanal,Plactacte)
 
 from gestionapp.serializers import (
     DepositoSerializer, MaterialSerializer, ArticuloSerializer, ClienteSerializer, ProveedorSerializer,
@@ -25,6 +25,7 @@ from gestionapp.serializers import (
     ClientesdirecciondetalleSerializer, BancoSerializer, MaterialesEstadoSerializer,
     CotizacionEstadoSerializer,
     MempleadosSerializer,EmpleadoSerializer,PlmovpersonalSerializer,RecetasSerializer, ProddetrecetasSerializer, MrecetasSerializer,
+    ProduccionSerializer, ProddetproduccionSerializer, MproduccionSerializer,
     PldatosrelojSerializer,PltareosemanalSerializer,MtareoSerializer,PlctacteSerializer)
 
 from django.contrib.auth.models import User
@@ -101,6 +102,27 @@ class GeneratePDFMaterialesDetail(PDFTemplateView):
 
 #PRODUCCION
 
+class ProduccionViewSet(viewsets.ModelViewSet):
+    queryset = Proproduccion.objects.all().order_by('codigo')
+    serializer_class = MproduccionSerializer
+
+class ProduccionList(generics.ListCreateAPIView):
+    queryset = Proproduccion.objects.all().order_by('codigo')
+    serializer_class = ProduccionSerializer
+
+class ProduccionDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Prodetproduccion.objects.all().order_by('codigo')
+    serializer_class = ProddetproduccionSerializer
+
+class ProdetproduccionList(generics.ListCreateAPIView):
+    queryset = Prodetproduccion.objects.all().order_by('codigo')
+    serializer_class = ProddetproduccionSerializer
+
+class ProdetproduccionDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Prodetproduccion.objects.all().order_by('codigo')
+    serializer_class = ProddetproduccionSerializer
+
+#
 class RecetasViewSet(viewsets.ModelViewSet):
     queryset = Prorecetas.objects.all().order_by('codigo')
     serializer_class = MrecetasSerializer
